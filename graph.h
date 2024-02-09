@@ -49,6 +49,11 @@ public:
     void printGraphMetaData();
 
 public:
+
+    const ui* getOffsets() const {
+        return offsets;
+    }
+
     const ui getLabelsCount() const {
         return labels_count;
     }
