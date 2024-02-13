@@ -7,6 +7,8 @@
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
 
+    std::cout << "------------------------ In Filter Method ------------------------"  << std::endl;
+
     if(q_vtx_nlc.size() >= d_vtx_nlc.size()){
         return false;
     }
@@ -21,6 +23,8 @@ bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_n
 }
 
 bool checkNonTreeEdges(Graph* data_graph, ui* query_match_order_idx, std::vector<std::pair<VertexID, VertexID>>& query_ntes,  std::vector<VertexID>& partial_result){
+
+    std::cout << "------------------------ In Non Tree Edge Method ------------------------"  << std::endl;
 
     bool edgeExists = false;
 
@@ -79,6 +83,8 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
 
 void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<VertexID, VertexID>>& non_tree_edges, std::vector<ui>& matching_order){
+
+    std::cout << "------------------------ In Enumerate Method ------------------------"  << std::endl;
 
     VertexID start_vertex = matching_order[0];
     std::vector<VertexID> candidate_vtx_vector, partial_result;

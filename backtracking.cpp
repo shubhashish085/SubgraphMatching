@@ -10,6 +10,8 @@ bool
 AlgorithmStore :: DFSTraversal(const Graph *graph, VertexID start_node, std::vector<std::pair<VertexID , VertexID>>& non_tree_edges, std::vector<ui>& matching_order,
                                std::vector<bool>& visited){
 
+    std::cout << "------------------------ In DFSTraversal Method ------------------------"  << std::endl;
+
     visited[start_node] = true;
     VertexID vertex_to_be_explored = start_node;
     ui neighbor_count = 0;
@@ -32,6 +34,8 @@ AlgorithmStore :: DFSTraversal(const Graph *graph, VertexID start_node, std::vec
 bool
 AlgorithmStore :: BFSTraversal(const Graph *graph, VertexID start_node, std::vector<std::pair<VertexID , VertexID>>& non_tree_edges, std::vector<ui>& matching_order,
                                std::vector<bool>& visited){
+
+    std::cout << "------------------------ In BFSTraversal Method ------------------------"  << std::endl;
 
     visited[start_node] = true;
     VertexID vertex_to_be_explored = start_node;
