@@ -7,7 +7,7 @@
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
 
-    std::cout << "------------------------ In Filter Method ------------------------"  << std::endl;
+    //std::cout << "------------------------ In Filter Method ------------------------"  << std::endl;
 
     if(q_vtx_nlc.size() >= d_vtx_nlc.size()){
         return false;
@@ -53,7 +53,7 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
         std::cout << "Matched" << std::endl;
 
-        for(ui i = 0; i < query_vertices_count; i++){
+        for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
             std::cout << partial_result[i] << " ";
         }
         std::cout << std::endl;
@@ -67,7 +67,7 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
         for(ui i = 0; i < neighbor_count; i++){
 
-            bool isEligible = filter_by_neighborhood_label_count(data_graph-> getNeighborhoodLabelCount()[neighbors[i]],
+            bool isEligible = filter_by_neighborhood_label_count(data_graph-> getNeighborhoodLabelCount()[neighbors[i]]),
                                     query_graph-> getNeighborhoodLabelCount()[matching_order[matching_idx + 1]]) && (data_graph->getVertexLabel(neighbors[i]) == query_graph->getVertexLabel(matching_order[matching_idx + 1]));
             if(isEligible){
                 matching_idx++;
@@ -91,7 +91,7 @@ void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<Vert
 
     for(VertexID i = 0; i < data_graph-> getVerticesCount(); i++){
         if(data_graph->getVertexLabel(i) == query_graph->getVertexLabel(start_vertex) &&
-        filter_by_neighborhood_label_count(data_graph->getNeighborhoodLabelCount()[i], query_graph->getNeighborhoodLabelCount()[start_vertex])){
+        filter_by_neighborhood_label_count(data_graph->getNeighborhoodLabelCount()->find(i), query_graph->getNeighborhoodLabelCount()[start_vertex])){
             candidate_vtx_vector.push_back(i);
         }
     }
@@ -105,13 +105,13 @@ void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<Vert
 
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "query.graph";
-    std::string input_data_graph_file = "data.graph";
+    std::string input_query_graph_file = "basic_query_graph.graph";
+    std::string input_data_graph_file = "basic_data_graph.graph";
 
-    Graph* query_graph = new Graph(true);
+    Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
 
-    Graph* data_graph = new Graph(true);
+    Graph* data_graph = new Graph();
     query_graph->loadGraphFromFile(input_data_graph_file);
 
     std::vector<ui> matching_order;

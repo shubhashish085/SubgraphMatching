@@ -23,7 +23,7 @@ AlgorithmStore :: DFSTraversal(const Graph *graph, VertexID start_node, std::vec
             matching_order.push_back(neighbors[iterator]);
             DFSTraversal(graph, neighbors[iterator], non_tree_edges, matching_order, visited);
         } else{
-            pair<VertexID, VertexID> nte = make_pair(vertex_to_be_explored, neighbors[iterator]);
+            std::pair<VertexID, VertexID> nte = std::make_pair(vertex_to_be_explored, neighbors[iterator]);
             non_tree_edges.push_back(nte);
         }
     }
@@ -43,17 +43,18 @@ AlgorithmStore :: BFSTraversal(const Graph *graph, VertexID start_node, std::vec
     bfs_queue.push(start_node);
 
     while(!bfs_queue.empty()){
-
-        VertexID front_vertex = bfs_queue.pop();
-        VertexID * neighbors = graph ->getVertexNeighbors(front_vertex, neighbor_count);
         ui neighbor_count = 0;
+        VertexID front_vertex = bfs_queue.front();
+        bfs_queue.pop();
+        VertexID * neighbors = graph ->getVertexNeighbors(front_vertex, neighbor_count);
+
         for(ui iterator = 0; iterator < neighbor_count; iterator++){
             if(!visited[neighbors[iterator]]){
                 bfs_queue.push(neighbors[iterator]);
                 matching_order.push_back(neighbors[iterator]);
                 visited[neighbors[iterator]] = true;
             }else{
-                pair<VertexID, VertexID> nte = make_pair(front_vertex, neighbors[iterator]);
+                std::pair<VertexID, VertexID> nte = std::make_pair(front_vertex, neighbors[iterator]);
                 non_tree_edges.push_back(nte);
             }
         }

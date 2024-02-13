@@ -2,6 +2,8 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
+#include <unordered_map>
+#include <vector>
 #include "types.h"
 
 class Graph{
@@ -69,6 +71,10 @@ public:
         return edges_count;
     }
 
+    const ui getVertexDegree(const VertexID id) const {
+        return offsets[id + 1] - offsets[id];
+    }
+
     const ui getGraphMaxDegree() const {
         return max_degree;
     }
@@ -85,12 +91,12 @@ public:
         return labels[id];
     }
 
-    const ui * getVertexNeighbors(const VertexID id, ui& count) const {
+    ui * getVertexNeighbors(const VertexID id, ui& count) const {
         count = offsets[id + 1] - offsets[id]; // used for neighbor count
         return neighbors + offsets[id];
     }
 
-    const ui * getMatchingOrderIndex() const {
+    ui * getMatchingOrderIndex() const {
         return matching_order_idx;
     }
 
