@@ -16,8 +16,10 @@ private:
 
     ui* offsets;
     VertexID * neighbors;
+    ui* matching_order_idx;
     LabelID* labels;
 
+    std::unordered_map<LabelID, ui> * neighborhood_label_count;
     std::unordered_map<LabelID, ui> labels_frequency;
 
 public:
@@ -33,6 +35,7 @@ public:
         offsets = NULL;
         neighbors = NULL;
         labels = NULL;
+        neighborhood_label_count = NULL;
 
         labels_frequency.clear();
 
@@ -85,6 +88,27 @@ public:
     const ui * getVertexNeighbors(const VertexID id, ui& count) const {
         count = offsets[id + 1] - offsets[id]; // used for neighbor count
         return neighbors + offsets[id];
+    }
+
+    const ui * getMatchingOrderIndex() const {
+        return matching_order_idx;
+    }
+
+    const std::unordered_map<LabelID, ui> * getNeighborhoodLabelCount(){
+        return neighborhood_label_count;
+    }
+
+    const std::vector<VertexID> getVerticesOfLabel(LabelID labelId) const {
+
+        std::vector<VertexID> candidate_vertices;
+
+        for(VertexID i = 0; i < vertices_count; i++){
+            if(labels[i] == labelId){
+                candidate_vertices.push_back(i);
+            }
+        }
+
+        return candidate_vertices;
     }
 
     bool checkEdgeExistence(VertexID u, VertexID v) const {

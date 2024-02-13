@@ -21,10 +21,11 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
 
     neighbors = new VertexID[edges_count * 2];
     labels = new LabelID[vertices_count];
+    neighborhood_label_count = new std::unordered_map<LabelID, ui>[vertices_count];
     labels_count = 0;
     max_degree = 0;
 
-    LabelID max_label_id = 0;
+    LabelID max_label_id = 0, begin_vtx_label, end_vtx_label;
     std::vector<ui> neighbors_offset(vertices_count, 0);// used for adjust neighbors with offset
 
     while (infile >> type) {
@@ -62,6 +63,17 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
 
             neighbors_offset[begin] += 1;
             neighbors_offset[end] += 1;
+
+            if(neighborhood_label_count[begin].find(labels[begin]) == neighborhood_label_count[begin].end()){
+                neighborhood_label_count[begin][labels[begin]] = 0;
+            }
+            neighborhood_label_count[begin][labels[begin]] += 1;
+
+            if(neighborhood_label_count[end].find(labels[end]) == neighborhood_label_count[end].end()){
+                neighborhood_label_count[end][labels[end]] = 0;
+            }
+            neighborhood_label_count[end][labels[end]] += 1;
+
         }
     }
 
