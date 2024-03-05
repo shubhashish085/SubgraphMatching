@@ -64,18 +64,34 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
             neighbors_offset[begin] += 1;
             neighbors_offset[end] += 1;
 
-            if(neighborhood_label_count[begin].find(labels[begin]) == neighborhood_label_count[begin].end()){
-                neighborhood_label_count[begin][labels[begin]] = 0;
+            if(neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()){
+                neighborhood_label_count[begin][labels[end]] = 0;
             }
-            neighborhood_label_count[begin][labels[begin]] += 1;
+            neighborhood_label_count[begin][labels[end]] += 1;
 
-            if(neighborhood_label_count[end].find(labels[end]) == neighborhood_label_count[end].end()){
-                neighborhood_label_count[end][labels[end]] = 0;
+            if(neighborhood_label_count[end].find(labels[begin]) == neighborhood_label_count[begin].end()){
+                neighborhood_label_count[end][labels[begin]] = 0;
             }
-            neighborhood_label_count[end][labels[end]] += 1;
+            neighborhood_label_count[end][labels[begin]] += 1;
 
         }
     }
+
+    std::cout << " --------- Neighbors " << std::endl;
+
+    for(ui i = 0; i < edges_count * 2; i++){
+        std::cout << " " << neighbors[i] ;
+    }
+
+    std::cout << std::endl;
+
+    std::cout << " --------- Offsets " << std::endl;
+
+    for(ui i = 0; i < vertices_count + 1; i++){
+        std::cout << " " << offsets[i] ;
+    }
+
+    std::cout << std::endl;
 
     infile.close();
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
@@ -91,6 +107,16 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
     }
 
     //BuildReverseIndex();
+
+}
+
+void Graph::setMatchingOrderIndex(std::vector<ui> matching_order){
+
+    matching_order_idx = new ui[vertices_count];
+
+    for(ui i = 0; i < vertices_count; i++){
+        matching_order_idx[matching_order[i]] = i;
+    }
 
 }
 

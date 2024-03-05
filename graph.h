@@ -52,6 +52,7 @@ public:
 public:
     void loadGraphFromFile(const std::string& file_path);
     void printGraphMetaData();
+    void setMatchingOrderIndex(std::vector<ui> matching_order);
 
 public:
 
@@ -100,7 +101,7 @@ public:
         return matching_order_idx;
     }
 
-    const std::unordered_map<LabelID, ui> * getNeighborhoodLabelCount(){
+    std::unordered_map<LabelID, ui> * getNeighborhoodLabelCount(){
         return neighborhood_label_count;
     }
 
