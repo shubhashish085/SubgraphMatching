@@ -4,6 +4,9 @@
 
 #include "graph.h"
 #include "backtracking.h"
+#include "FilterVertices.h"
+#include "GeneratingFilterPlan.h"
+#define INVALID_VERTEX_ID 100000000
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
 
@@ -67,6 +70,10 @@ void vectorCopyToArray(std::vector<VertexID>& candidate_vtr, VertexID* vertex_li
         vertex_list[i] = candidate_vtr[i];
     }
 }
+
+
+
+
 
 void stackBasedDFS(Graph* data_graph, Graph* query_graph, std::vector<ui>& matching_order, std::vector<VertexID>* candidate_vtx_vector){
 
@@ -242,6 +249,19 @@ void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<Vert
     }*/
 }
 
+void studyPerfomance(Graph* query_graph, Graph* data_graph){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+
+}
+
+
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../basic_query_graph.graph";
@@ -260,6 +280,7 @@ int main(int argc, char** argv) {
     std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
 
     std::vector<bool> visited;
+    int* parent_vtr;
 
     std::unordered_map<VertexID, ui>* vertex_map = query_graph -> getNeighborhoodLabelCount();
 
@@ -277,7 +298,7 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    AlgorithmStore::BFSTraversal(query_graph, 0, non_tree_edges, matching_order, visited);
+    /*AlgorithmStore::BFSTraversal(query_graph, 0, non_tree_edges, matching_order, visited, parent_vtr);
 
     query_graph -> setMatchingOrderIndex(matching_order);
 
@@ -289,6 +310,6 @@ int main(int argc, char** argv) {
 
     std::cout << std::endl;
 
-    enumerate(data_graph, query_graph, non_tree_edges, matching_order);
+    enumerate(data_graph, query_graph, non_tree_edges, matching_order);*/
 
 }

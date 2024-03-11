@@ -21,6 +21,9 @@ private:
     ui* matching_order_idx;
     LabelID* labels;
 
+    ui* reverse_index_offsets;
+    ui* reverse_index;
+
     std::unordered_map<LabelID, ui> * neighborhood_label_count;
     std::unordered_map<LabelID, ui> labels_frequency;
 
@@ -39,6 +42,9 @@ public:
         labels = NULL;
         neighborhood_label_count = NULL;
 
+        reverse_index_offsets = NULL;
+        reverse_index = NULL;
+
         labels_frequency.clear();
 
     }
@@ -47,6 +53,8 @@ public:
         delete[] offsets;
         delete[] neighbors;
         delete[] labels;
+        delete[] reverse_index_offsets;
+        delete[] reverse_index;
     }
 
 public:
@@ -55,6 +63,8 @@ public:
     void setMatchingOrderIndex(std::vector<ui> matching_order);
 
 public:
+
+    void BuildReverseIndex();
 
     const ui* getOffsets() const {
         return offsets;
@@ -84,12 +94,21 @@ public:
         return max_label_frequency;
     }
 
+    const std::unordered_map<LabelID, ui>* getVertexNLF(const VertexID id) const {
+        return neighborhood_label_count + id;
+    }
+
     const ui getLabelsFrequency(const LabelID label) const {
         return labels_frequency.find(label) == labels_frequency.end() ? 0 : labels_frequency.at(label);
     }
 
     const LabelID getVertexLabel(const VertexID id) const {
         return labels[id];
+    }
+
+    const ui * getVerticesByLabel(const LabelID id, ui& count) const {
+        count = reverse_index_offsets[id + 1] - reverse_index_offsets[id];
+        return reverse_index + reverse_index_offsets[id];
     }
 
     ui * getVertexNeighbors(const VertexID id, ui& count) const {

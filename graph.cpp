@@ -6,6 +6,23 @@
 #include <algorithm>
 
 
+void Graph::BuildReverseIndex() {
+    reverse_index = new ui[vertices_count];
+    reverse_index_offsets= new ui[labels_count + 1];
+    reverse_index_offsets[0] = 0;
+
+    ui total = 0;
+    for (ui i = 0; i < labels_count; ++i) {
+        reverse_index_offsets[i + 1] = total;
+        total += labels_frequency[i];
+    }
+
+    for (ui i = 0; i < vertices_count; ++i) {
+        LabelID label = labels[i];
+        reverse_index[reverse_index_offsets[label + 1]++] = i;
+    }
+}
+
 void Graph::loadGraphFromFile(const std::string &file_path) {
     std::ifstream infile(file_path);
 
@@ -106,7 +123,7 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
         std::sort(neighbors + offsets[i], neighbors + offsets[i + 1]); // sorting the neighbors of every vertex
     }
 
-    //BuildReverseIndex();
+    BuildReverseIndex();
 
 }
 
