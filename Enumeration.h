@@ -1,0 +1,14 @@
+//
+// Created by antu on 3/11/24.
+//
+
+#ifndef SUBGRAPHMATCHINGMAIN_ENUMERATE_H
+#define SUBGRAPHMATCHINGMAIN_ENUMERATE_H
+
+
+class Enumerate {
+
+};
+
+
+#endif //SUBGRAPHMATCHINGMAIN_ENUMERATE_H
