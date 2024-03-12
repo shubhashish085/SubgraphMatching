@@ -15,6 +15,8 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         FilterVertices.cpp
         GeneratingFilterPlan.h
         GeneratingFilterPlan.cpp
+        Enumeration.h
+        Enumeration.cpp
         graph.cpp
         graph.h
         types.h

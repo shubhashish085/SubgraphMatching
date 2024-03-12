@@ -55,6 +55,9 @@ FilterVertices::NLFFilter(const Graph *data_graph, const Graph *query_graph, ui 
 bool
 FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree) {
+
+    std::cout << "############### CFL Filter ########################" << std::endl;
+
     allocateBuffer(data_graph, query_graph, candidates, candidates_count);
     int level_count;
     ui* level_offset;
@@ -67,6 +70,7 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
     ui* flag = new ui[data_graph->getVerticesCount()];
     std::fill(flag, flag + data_graph->getVerticesCount(), 0);
 
+    std::cout << "Top down Generation" << std::endl;
     // Top-down generation.
     for (int i = 1; i < level_count; ++i) {
         // Forward generation.
@@ -110,6 +114,9 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
 void FilterVertices::generateCandidates(const Graph *data_graph, const Graph *query_graph, VertexID query_vertex,
                         VertexID *pivot_vertices, ui pivot_vertices_count, VertexID **candidates,
                         ui *candidates_count, ui *flag, ui *updated_flag) {
+
+    std::cout << "################# generateCandidates #############" << std::endl;
+
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);
 
@@ -180,6 +187,9 @@ void FilterVertices::generateCandidates(const Graph *data_graph, const Graph *qu
 void FilterVertices::pruneCandidates(const Graph *data_graph, const Graph *query_graph, VertexID query_vertex,
                      VertexID *pivot_vertices, ui pivot_vertices_count, VertexID **candidates,
                      ui *candidates_count, ui *flag, ui *updated_flag) {
+
+    std::cout << "################# pruneCandidates #############" << std::endl;
+
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);
 
@@ -233,7 +243,7 @@ void FilterVertices::pruneCandidates(const Graph *data_graph, const Graph *query
 
 void FilterVertices::allocateBuffer(const Graph *data_graph, const Graph *query_graph, ui **&candidates,
                                     ui *&candidates_count) {
-    printf("############## Allocating Buffer ##############");
+    std::cout << "############## Allocating Buffer ##############" << std::endl;
     ui query_vertex_num = query_graph->getVerticesCount();
     ui candidates_max_num = data_graph->getGraphMaxLabelFrequency(); // candidate number of any vertex can be at most the maximum label frequency of
     //  any label in the data graph
@@ -286,9 +296,6 @@ FilterVertices::computeCandidateWithNLF(const Graph *data_graph, const Graph *qu
     ui data_vertex_num;
     const ui* data_vertices = data_graph->getVerticesByLabel(label, data_vertex_num);
 
-    //<SK>
-    printf("#### Vertex with Label Id : %d, count : %d #######\n", label, data_vertex_num);
-    //</SK>
     count = 0;
     for (ui j = 0; j < data_vertex_num; ++j) {
         ui data_vertex = data_vertices[j];

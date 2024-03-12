@@ -26,6 +26,7 @@ private:
 
     std::unordered_map<LabelID, ui> * neighborhood_label_count;
     std::unordered_map<LabelID, ui> labels_frequency;
+    ui* labels_offsets;
 
 public:
 
@@ -45,6 +46,7 @@ public:
         reverse_index_offsets = NULL;
         reverse_index = NULL;
 
+        labels_offsets = NULL;
         labels_frequency.clear();
 
     }
@@ -55,6 +57,8 @@ public:
         delete[] labels;
         delete[] reverse_index_offsets;
         delete[] reverse_index;
+        delete[] neighborhood_label_count;
+        delete[] labels_offsets;
     }
 
 public:
@@ -94,10 +98,6 @@ public:
         return max_label_frequency;
     }
 
-    const std::unordered_map<LabelID, ui>* getVertexNLF(const VertexID id) const {
-        return neighborhood_label_count + id;
-    }
-
     const ui getLabelsFrequency(const LabelID label) const {
         return labels_frequency.find(label) == labels_frequency.end() ? 0 : labels_frequency.at(label);
     }
@@ -109,6 +109,35 @@ public:
     const ui * getVerticesByLabel(const LabelID id, ui& count) const {
         count = reverse_index_offsets[id + 1] - reverse_index_offsets[id];
         return reverse_index + reverse_index_offsets[id];
+    }
+
+    const ui * getNeighborsByLabel(const VertexID id, const LabelID label, ui& count) const {
+        ui offset = id * labels_count + label;
+        count = labels_offsets[offset + 1] - labels_offsets[offset];
+        return neighbors + labels_offsets[offset];
+    }
+
+    const std::unordered_map<LabelID, ui>* getVertexNLF(const VertexID id) const {
+        return neighborhood_label_count + id;
+    }
+
+    bool checkEdgeExistence(const VertexID u, const VertexID v, const LabelID u_label) const {
+        ui count = 0;
+        const VertexID* neighbors = getNeighborsByLabel(v, u_label, count);
+        int begin = 0;
+        int end = count - 1;
+        while (begin <= end) {
+            int mid = begin + ((end - begin) >> 1);
+            if (neighbors[mid] == u) {
+                return true;
+            }
+            else if (neighbors[mid] > u)
+                end = mid - 1;
+            else
+                begin = mid + 1;
+        }
+
+        return false;
     }
 
     ui * getVertexNeighbors(const VertexID id, ui& count) const {

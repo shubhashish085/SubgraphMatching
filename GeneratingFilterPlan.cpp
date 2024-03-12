@@ -11,6 +11,8 @@
 
 VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_graph, const Graph *query_graph) {
     //min heap
+
+    std::cout << " #################### selectCFLFilterStartVertex ############## " << std::endl;
     auto rank_compare = [](std::pair<VertexID, double> l, std::pair<VertexID, double> r) {
         return l.second < r.second;
     };
@@ -22,11 +24,11 @@ VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_grap
         VertexID query_vertex = i;
 
         //if (query_graph->get2CoreSize() == 0 || query_graph->getCoreValue(query_vertex) > 1) {
-        LabelID label = query_graph->getVertexLabel(query_vertex);
-        ui degree = query_graph->getVertexDegree(query_vertex);
-        ui frequency = data_graph->getLabelsFrequency(label);
-        double rank = frequency / (double) degree;
-        rank_queue.push(std::make_pair(query_vertex, rank));
+            LabelID label = query_graph->getVertexLabel(query_vertex);
+            ui degree = query_graph->getVertexDegree(query_vertex);
+            ui frequency = data_graph->getLabelsFrequency(label);
+            double rank = frequency / (double) degree;
+            rank_queue.push(std::make_pair(query_vertex, rank));
         //}
     }
 
@@ -56,6 +58,9 @@ VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_grap
 
 void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                                   VertexID *&order, int &level_count, ui *&level_offset) {
+
+    std::cout << " #################### GenerateCFLFilterPlan ############## " << std::endl;
+
     ui query_vertices_num = query_graph->getVerticesCount();
     VertexID start_vertex = selectCFLFilterStartVertex(data_graph, query_graph);
     AlgorithmStore::bfsTraversal(query_graph, start_vertex, tree, order);
@@ -68,6 +73,7 @@ void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const 
 
     level_count = -1;
     level_offset = new ui[query_vertices_num + 1];
+
 
     for (ui i = 0; i < query_vertices_num; ++i) {
         VertexID u = order[i];

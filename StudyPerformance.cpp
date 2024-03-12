@@ -6,6 +6,8 @@
 #include "backtracking.h"
 #include "FilterVertices.h"
 #include "GeneratingFilterPlan.h"
+#include "Enumeration.h"
+#include <limits>
 #define INVALID_VERTEX_ID 100000000
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
@@ -202,6 +204,7 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
 
 
+
 void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<VertexID, VertexID>>& non_tree_edges, std::vector<ui>& matching_order){
 
     std::cout << "------------------------ In Enumerate Method ------------------------"  << std::endl;
@@ -255,10 +258,30 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
     TreeNode* query_tree = NULL;
     ui** candidates = NULL;
     ui* candidates_count = NULL;
+    size_t call_count = 0;
+    size_t output_limit = std::numeric_limits<size_t>::max();
 
     FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
 
+    std::cout << "####### Matching Order : " ;
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << matching_order[i] << " " ;
+    }
 
+    std::cout << std::endl;
+
+    std::cout << "####### Candidates  "  << std::endl;
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << "Candidate count of  " << i << " : " << candidates_count[i] << "----";
+        for(ui j = 0; j < candidates_count[i]; j++){
+            std::cout << " " << candidates[i][j];
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
 }
 
 
@@ -311,5 +334,7 @@ int main(int argc, char** argv) {
     std::cout << std::endl;
 
     enumerate(data_graph, query_graph, non_tree_edges, matching_order);*/
+
+    studyPerfomance(query_graph, data_graph);
 
 }
