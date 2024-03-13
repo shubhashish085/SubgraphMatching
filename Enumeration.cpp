@@ -18,13 +18,12 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
 
     for (ui i = 0; i < candidates_count[u]; ++i) {
         VertexID v = candidates[u][i];
-        TreeNode u_tree = tree[u];
 
         if (!visited_vertices[v]) {
             bool valid = true;
 
-            for (ui j = 0; j < u_tree.bn_count_; ++j) {
-                VertexID u_nbr = u_tree.bn_[j];
+            for (ui j = 0; j < tree[u].bn_count_; ++j) {
+                VertexID u_nbr = tree[u].bn_[j];
                 VertexID u_nbr_v = embedding[u_nbr];
 
                 if (!data_graph->checkEdgeExistence(v, u_nbr_v)) {
@@ -38,6 +37,19 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
             }
         }
     }
+
+    std::cout << " ################## end generateValidCandidates ##################" << std::endl;
+}
+
+void Enumerate::printMatch(ui* embedding, ui max_depth){
+
+    std::cout << "------------------ Matched -------------------" << std::endl;
+
+    for(ui i = 0; i < max_depth; i++){
+        std::cout << "(" << i << "," << embedding[i] << "),";
+    }
+
+    std::cout << std::endl;
 }
 
 
@@ -88,6 +100,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
             if (cur_depth == max_depth - 1) {
                 embedding_cnt += 1;
                 visited_vertices[v] = false;
+                printMatch(embedding, query_graph->getVerticesCount());
                 if (embedding_cnt >= output_limit_num) {
                     goto EXIT;
                 }
@@ -119,7 +132,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
 
     delete[] valid_candidate;
 
-    std::cout << " ################## end Explore ##################" << std::endl;
+    std::cout << " Total Embedding Count " << embedding_cnt << std::endl;
 
     return embedding_cnt;
 }

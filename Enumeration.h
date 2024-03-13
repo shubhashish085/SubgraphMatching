@@ -11,6 +11,7 @@
 class Enumerate {
 
 public:
+    static void printMatch(ui* embedding, ui max_depth);
     static size_t explore(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                           TreeNode *& tree, size_t output_limit_num, size_t &call_count);
 

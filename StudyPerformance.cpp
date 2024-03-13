@@ -281,6 +281,15 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 
     std::cout << std::endl;
 
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << " Tree Node : " << i  << " back neighbor count : " << query_tree[i].bn_count_ << std::endl;
+        for(ui j = 0; j < query_tree[i].bn_count_; j++){
+            std::cout << query_tree[i].bn_[j] << " " ;
+        }
+        std::cout << std::endl;
+    }
+
+
     Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
 }
 
@@ -288,7 +297,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../basic_query_graph.graph";
-    std::string input_data_graph_file = "../basic_data_graph.graph";
+    std::string input_data_graph_file = "../data_graph_2.graph";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
