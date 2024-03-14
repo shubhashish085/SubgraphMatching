@@ -154,12 +154,6 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
     if(partial_result.size() == query_graph->getVerticesCount()){
 
-        /*bool nte_match = checkNonTreeEdges(data_graph, query_graph->getMatchingOrderIndex(), query_ntes, partial_result);
-
-        if(!nte_match){
-            return;
-        }*/
-
         std::cout << "Matched" << std::endl;
 
         for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
@@ -173,17 +167,8 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
 
         ui neighbor_count;
         VertexID * neighbors = data_graph -> getVertexNeighbors(candidate_vtx, neighbor_count);
-        /*std::cout << "Candidate vertex : " << candidate_vtx << " Neighbor Count : " << neighbor_count << std::endl;
-
-        for(ui j = 0; j < neighbor_count; j++) {
-            std::cout << " Neighbor : " << neighbors[j] << " ";
-        }
-        std::cout << std::endl;*/
 
         for(ui i = 0; i < neighbor_count; i++){
-
-            //bool isEligible = filter_by_neighborhood_label_count(data_graph-> getNeighborhoodLabelCount()[neighbors[i]],
-                                    //query_graph-> getNeighborhoodLabelCount()[matching_order[matching_idx + 1]]) && (data_graph->getVertexLabel(neighbors[i]) == query_graph->getVertexLabel(matching_order[matching_idx + 1]));
 
             bool edge_already_taken = edgeTaken(candidate_vtx, neighbors[i], all_edges);
 
@@ -297,7 +282,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../basic_query_graph.graph";
-    std::string input_data_graph_file = "../data_graph_2.graph";
+    std::string input_data_graph_file = "../data_graph_4.graph";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
