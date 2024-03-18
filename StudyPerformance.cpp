@@ -149,6 +149,45 @@ void stackBasedDFS(Graph* data_graph, Graph* query_graph, std::vector<ui>& match
 }
 
 
+/*void match(Graph* data_graph, Graph* query_graph, std::vector<ui>& matching_order, std::vector<VertexID>* candidate_vtx_vector){
+
+    if(partial_result.size() == query_graph->getVerticesCount()){
+
+        std::cout << "Matched" << std::endl;
+
+        for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
+            std::cout << partial_result[i] << " ";
+        }
+        std::cout << std::endl;
+
+        return;
+
+    }else{
+
+        ui neighbor_count;
+        VertexID * neighbors = data_graph -> getVertexNeighbors(candidate_vtx, neighbor_count);
+
+        for(ui i = 0; i < neighbor_count; i++){
+
+            bool edge_already_taken = edgeTaken(candidate_vtx, neighbors[i], all_edges);
+
+            if(!edge_already_taken){
+                matching_idx++;
+                partial_result.push_back(neighbors[i]);
+                all_edges.push_back(std::make_pair(candidate_vtx, neighbors[i]));
+                match(data_graph, query_graph, neighbors[i], matching_order, matching_idx, query_ntes, partial_result, all_edges);
+                all_edges.pop_back();
+                partial_result.pop_back();
+                matching_idx--;
+            }
+        }
+
+    }
+}
+
+
+
+
 void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::vector<ui>& matching_order, ui matching_idx,
          std::vector<std::pair<VertexID, VertexID>>& query_ntes,  std::vector<VertexID>& partial_result, std::vector<std::pair<VertexID, VertexID>>& all_edges){
 
@@ -184,7 +223,7 @@ void match(Graph* data_graph, Graph* query_graph, VertexID candidate_vtx, std::v
         }
 
     }
-}
+}*/
 
 
 
@@ -237,6 +276,49 @@ void enumerate(Graph* data_graph, Graph* query_graph, std::vector<std::pair<Vert
     }*/
 }
 
+void exploreByRecursion(const Graph *data_graph, const Graph *query_graph, ui **candidates,
+                          ui *candidates_count, ui *order, TreeNode *& tree,
+                          size_t output_limit_num, size_t &call_count){
+
+    size_t embedding_count = 0;
+    int cur_depth = 0;
+    int max_depth = query_graph->getVerticesCount();
+    VertexID start_vertex = order[0];
+
+
+    // Allocate the memory buffer.
+    ui *idx;
+    ui *idx_count;
+    ui *embedding;
+    VertexID **valid_candidate;
+    bool *visited_vertices;
+
+    idx = new ui[max_depth];
+    idx_count = new ui[max_depth];
+    embedding = new ui[max_depth];
+    visited_vertices = new bool[data_graph->getVerticesCount()];
+    std::fill(visited_vertices, visited_vertices + data_graph->getVerticesCount(), false);
+    valid_candidate = new ui *[max_depth];
+
+    ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
+    for (ui i = 0; i < max_depth; ++i) {
+        valid_candidate[i] = new VertexID[max_candidate_count];
+    }
+
+    idx[cur_depth] = 0;
+    idx_count[cur_depth] = candidates_count[start_vertex];
+    std::copy(candidates[start_vertex], candidates[start_vertex] + candidates_count[start_vertex],
+              valid_candidate[cur_depth]);
+
+    for(ui i = 0; i < idx_count[cur_depth]; i++){
+        Enumerate::exploreRecursiveFashion(data_graph, query_graph, candidates, candidates_count, embedding,
+                cur_depth, max_depth, order, idx, idx_count, visited_vertices, valid_candidate,
+                tree, embedding_count, call_count);
+    }
+
+
+}
+
 void studyPerfomance(Graph* query_graph, Graph* data_graph){
 
     ui* matching_order = NULL;
@@ -274,15 +356,29 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
         std::cout << std::endl;
     }
 
+    //Stack Based Strategy
+    //Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
 
-    Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
+    //Recursive Strategy
+    //exploreByRecursion(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
+
+    //Recursive Strategy Without Candidate
+    ui * embedding = new ui[query_graph -> getVerticesCount()];
+    bool* visited_vertices = new bool[data_graph -> getVerticesCount()];
+
+    for(ui i = 0; i < data_graph->getVerticesCount(); i++){
+        visited_vertices[i] = false;
+    }
+
+    Enumerate::exploreWithoutCandidate(data_graph, query_graph, matching_order, embedding, 0, visited_vertices, query_tree);
+
 }
 
 
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../basic_query_graph.graph";
-    std::string input_data_graph_file = "../data_graph_4.graph";
+    std::string input_query_graph_file = "../tests/basic_query_graph.graph";
+    std::string input_data_graph_file = "../tests/basic_data_graph.graph";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
@@ -303,31 +399,10 @@ int main(int argc, char** argv) {
 
     std::cout << "Neighborhood Label Count " << std::endl;
 
-    /*for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << "Vertex ID : " << i << std::endl;
-        for(auto iterator: query_graph->getNeighborhoodLabelCount()[i]){
-            std::cout << "Label ID " << iterator.first << " count : " << query_graph->getNeighborhoodLabelCount()[i][iterator.first] << std::endl;
-        }
-    }*/
-
 
     for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
         visited.push_back(false);
     }
-
-    /*AlgorithmStore::BFSTraversal(query_graph, 0, non_tree_edges, matching_order, visited, parent_vtr);
-
-    query_graph -> setMatchingOrderIndex(matching_order);
-
-    std::cout << "Matching Order : " ;
-
-    for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
-        std::cout << matching_order[i] << " ";
-    }
-
-    std::cout << std::endl;
-
-    enumerate(data_graph, query_graph, non_tree_edges, matching_order);*/
 
     studyPerfomance(query_graph, data_graph);
 

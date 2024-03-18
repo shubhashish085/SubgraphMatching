@@ -19,6 +19,8 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         Enumeration.cpp
         graph.cpp
         graph.h
+        utilities.cpp
+        utilities.h
         types.h
         util.h
         wtime.h
