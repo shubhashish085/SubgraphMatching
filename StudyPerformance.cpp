@@ -327,6 +327,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
     ui* candidates_count = NULL;
     size_t call_count = 0;
     size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
 
     FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
 
@@ -358,9 +359,11 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 
     //Stack Based Strategy
     //Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
+    std::cout << "Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
 
     //Recursive Strategy
     //exploreByRecursion(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
+    std::cout << "Recursive Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
 
     //Recursive Strategy Without Candidate
     ui * embedding = new ui[query_graph -> getVerticesCount()];
@@ -370,7 +373,8 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
         visited_vertices[i] = false;
     }
 
-    Enumerate::exploreWithoutCandidate(data_graph, query_graph, matching_order, embedding, 0, visited_vertices, query_tree);
+    Enumerate::exploreWithoutCandidate(data_graph, query_graph, matching_order, embedding, 0, visited_vertices, query_tree, embedding_count, call_count);
+    std::cout << "Recursive Strategy Without Candidate Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
 
 }
 

@@ -14,7 +14,7 @@ public:
     static void printMatch(ui* embedding, ui max_depth);
 
     static void exploreWithoutCandidate(const Graph *data_graph, const Graph *query_graph, ui *order, ui *embedding,
-                            ui curr_depth, bool* visited_vertices, TreeNode *& tree);
+                            ui curr_depth, bool* visited_vertices, TreeNode *& tree, size_t &embedding_count, size_t &call_count);
 
     static void exploreRecursiveFashion(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *embedding,
                             ui curr_depth, ui max_depth, ui *order, ui* idx, ui* idx_count, bool* visited_vertices, VertexID **valid_candidate,

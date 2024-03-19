@@ -223,9 +223,12 @@ void Enumerate::exploreRecursiveFashion(const Graph *data_graph, const Graph *qu
 }
 
 void Enumerate::exploreWithoutCandidate(const Graph *data_graph, const Graph *query_graph, ui *order, ui *embedding,
-                                        ui curr_depth, bool* visited_vertices, TreeNode *& tree) {
+                                        ui curr_depth, bool* visited_vertices, TreeNode *& tree, size_t &embedding_count, size_t &call_count) {
+
+    call_count++;
 
     if(curr_depth > query_graph->getVerticesCount() - 1){
+        embedding_count++;
         printMatch(embedding, query_graph->getVerticesCount());
         return;
     }
@@ -283,7 +286,7 @@ void Enumerate::exploreWithoutCandidate(const Graph *data_graph, const Graph *qu
             visited_vertices[v] = true;
             curr_depth++;
             exploreWithoutCandidate(data_graph, query_graph, order, embedding,
-                    curr_depth, visited_vertices, tree);
+                    curr_depth, visited_vertices, tree, embedding_count, call_count);
             curr_depth--;
             visited_vertices[v] = false;
         }
