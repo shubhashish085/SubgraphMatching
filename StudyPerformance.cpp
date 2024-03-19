@@ -7,6 +7,7 @@
 #include "FilterVertices.h"
 #include "GeneratingFilterPlan.h"
 #include "Enumeration.h"
+#include "ParallelEnumeration.h"
 #include <limits>
 #define INVALID_VERTEX_ID 100000000
 
@@ -326,6 +327,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
     ui** candidates = NULL;
     ui* candidates_count = NULL;
     size_t call_count = 0;
+    int thread_count = 2;
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
 
@@ -359,14 +361,24 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 
     //Stack Based Strategy
     //Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
-    std::cout << "Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
+    //std::cout << "Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
 
     //Recursive Strategy
     //exploreByRecursion(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
-    std::cout << "Recursive Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
+    //std::cout << "Recursive Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
+
+    //Parallel OpenMP
+    ui* embedding_cnt_array = ParallelEnumeration::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count);
+    for(ui i = 0; i < thread_count; i++){
+        embedding_count += embedding_cnt_array[i];
+    }
+
+    std::cout << "Parallel Strategy Embedding Count : " << embedding_count << std::endl;
+
+
 
     //Recursive Strategy Without Candidate
-    ui * embedding = new ui[query_graph -> getVerticesCount()];
+    /*ui * embedding = new ui[query_graph -> getVerticesCount()];
     bool* visited_vertices = new bool[data_graph -> getVerticesCount()];
 
     for(ui i = 0; i < data_graph->getVerticesCount(); i++){
@@ -374,7 +386,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
     }
 
     Enumerate::exploreWithoutCandidate(data_graph, query_graph, matching_order, embedding, 0, visited_vertices, query_tree, embedding_count, call_count);
-    std::cout << "Recursive Strategy Without Candidate Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
+    std::cout << "Recursive Strategy Without Candidate Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;*/
 
 }
 
@@ -382,7 +394,7 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph.graph";
-    std::string input_data_graph_file = "../tests/basic_data_graph.graph";
+    std::string input_data_graph_file = "../tests/data_graph_4.graph";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);

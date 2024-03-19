@@ -6,7 +6,7 @@ include_directories(
 )
 
 set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -g -Wall -march=native -pthread")
+        "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -O3 -g -Wall -march=native -pthread")
 
 set(SUBGRAPH_MATCHING_FILE_LIST
         backtracking.cpp
@@ -17,6 +17,8 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         GeneratingFilterPlan.cpp
         Enumeration.h
         Enumeration.cpp
+        ParallelEnumeration.h
+        ParallelEnumeration.cpp
         graph.cpp
         graph.h
         utilities.cpp
