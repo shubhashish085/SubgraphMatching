@@ -11,7 +11,7 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
                                             ui **valid_candidate, bool *visited_vertices, TreeNode *&tree,
                                             ui *order, ui **candidates, ui *candidates_count) {
 
-    std::cout << " ################## generateValidCandidates ##################" << std::endl;
+    //std::cout << " ################## generateValidCandidates ##################" << std::endl;
 
     VertexID u = order[depth];
 
@@ -39,7 +39,7 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
         }
     }
 
-    std::cout << " ################## end generateValidCandidates ##################" << std::endl;
+    //std::cout << " ################## end generateValidCandidates ##################" << std::endl;
 }
 
 void Enumerate::generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
@@ -91,12 +91,13 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
                                           ui *candidates_count, ui *order, TreeNode *& tree,
                                           size_t output_limit_num, size_t &call_count) {
 
-    std::cout << " ################## explore ##################" << std::endl;
+    //std::cout << " ################## explore ##################" << std::endl;
 
     size_t embedding_cnt = 0;
     int cur_depth = 0;
     int max_depth = query_graph->getVerticesCount();
     VertexID start_vertex = order[0];
+    call_count = 0;
 
 
     // Allocate the memory buffer.
@@ -130,11 +131,12 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
             embedding[u] = v;
             visited_vertices[v] = true;
             idx[cur_depth] += 1;
+            call_count++;
 
             if (cur_depth == max_depth - 1) {
                 embedding_cnt += 1;
                 visited_vertices[v] = false;
-                printMatch(embedding, query_graph->getVerticesCount());
+                //printMatch(embedding, query_graph->getVerticesCount());
                 if (embedding_cnt >= output_limit_num) {
                     goto EXIT;
                 }
@@ -166,7 +168,8 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
 
     delete[] valid_candidate;
 
-    std::cout << " Total Embedding Count " << embedding_cnt << std::endl;
+    std::cout << " Total Embedding Count : " << embedding_cnt << std::endl;
+    std::cout << "Total Operation Count : " << call_count << std::endl;
 
     return embedding_cnt;
 }
@@ -175,13 +178,13 @@ void Enumerate::exploreRecursiveFashion(const Graph *data_graph, const Graph *qu
                                ui curr_depth, ui max_depth, ui *order, ui* idx, ui* idx_count, bool* visited_vertices, VertexID **valid_candidate,
                                TreeNode *& tree, size_t &embedding_count, size_t &call_count){
 
-    std::cout << " Current Depth : " << curr_depth << std::endl;
+    //std::cout << " Current Depth : " << curr_depth << std::endl;
 
     if(curr_depth == query_graph ->getVerticesCount() - 1){
         VertexID u = order[curr_depth];
         VertexID v = valid_candidate[curr_depth][idx[curr_depth]];
         embedding[u] = v;
-        printMatch(embedding, max_depth);
+        //printMatch(embedding, max_depth);
         embedding_count++;
         return;
 
@@ -201,7 +204,7 @@ void Enumerate::exploreRecursiveFashion(const Graph *data_graph, const Graph *qu
         generateValidCandidatesForRecursive(data_graph, curr_depth, embedding, idx_count, valid_candidate,
                                                 visited_vertices, tree, order, candidates, candidates_count);
 
-        std::cout << " Valid Candidate Count : " << idx_count[curr_depth] << std::endl;
+        //std::cout << " Valid Candidate Count : " << idx_count[curr_depth] << std::endl;
 
         for(ui i = 0; (curr_depth <= max_depth - 1) && (i < idx_count[curr_depth]); i++){
             exploreRecursiveFashion(data_graph, query_graph, candidates, candidates_count, embedding,
@@ -229,7 +232,7 @@ void Enumerate::exploreWithoutCandidate(const Graph *data_graph, const Graph *qu
 
     if(curr_depth > query_graph->getVerticesCount() - 1){
         embedding_count++;
-        printMatch(embedding, query_graph->getVerticesCount());
+        //printMatch(embedding, query_graph->getVerticesCount());
         return;
     }
 
@@ -269,7 +272,7 @@ void Enumerate::exploreWithoutCandidate(const Graph *data_graph, const Graph *qu
 
     }
 
-    std::cout << "Candidates of " << u << " : " ;
+    //std::cout << "Candidates of " << u << " : " ;
     for(ui i = 0; i < candidate_count; i++){
         std::cout << v_candidates[i] << ", ";
     }

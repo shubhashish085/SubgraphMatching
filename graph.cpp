@@ -94,7 +94,7 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
         }
     }
 
-    std::cout << " --------- Neighbors " << std::endl;
+    /*std::cout << " --------- Neighbors " << std::endl;
 
     for(ui i = 0; i < edges_count * 2; i++){
         std::cout << " " << neighbors[i] ;
@@ -106,7 +106,7 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
 
     for(ui i = 0; i < vertices_count + 1; i++){
         std::cout << " " << offsets[i] ;
-    }
+    }*/
 
     std::cout << std::endl;
 

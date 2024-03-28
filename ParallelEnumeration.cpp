@@ -6,7 +6,7 @@
 #include "Enumeration.h"
 #include <omp.h>
 
-#define NUM_THREADS 2
+#define NUM_THREADS 8
 
 
 ui* ParallelEnumeration::explore(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
@@ -71,7 +71,7 @@ ui* ParallelEnumeration::explore(const Graph *data_graph, const Graph *query_gra
                 if (cur_depth == max_depth - 1) {
                     embedding_cnt_array[th_id] += 1;
                     visited_vertices[v] = false;
-                    Enumerate::printMatch(embedding, query_graph->getVerticesCount());
+                    //Enumerate::printMatch(embedding, query_graph->getVerticesCount());
                     if (embedding_cnt_array[th_id] >= thread_output_limit_num) {
                         goto EXIT;
                     }
