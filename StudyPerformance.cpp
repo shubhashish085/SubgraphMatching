@@ -321,7 +321,7 @@ void exploreByRecursion(const Graph *data_graph, const Graph *query_graph, ui **
 
 }
 
-void studyPerfomance(Graph* query_graph, Graph* data_graph){
+void studyPerformance(Graph* query_graph, Graph* data_graph){
 
     ui* matching_order = NULL;
     TreeNode* query_tree = NULL;
@@ -404,6 +404,40 @@ void studyPerfomance(Graph* query_graph, Graph* data_graph){
 
 int main(int argc, char** argv) {
 
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
+    std::string input_data_graph_file = "../tests/data_graph_1_wo_label.graph";
+
+    Graph* query_graph = new Graph();
+    query_graph->loadGraphFromFile(input_query_graph_file);
+
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
+
+    query_graph->printGraphMetaData();
+    data_graph->printGraphMetaData();
+
+    std::vector<ui> matching_order;
+    std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
+
+    std::vector<bool> visited;
+    int* parent_vtr;
+
+    std::unordered_map<VertexID, ui>* vertex_map = query_graph -> getNeighborhoodLabelCount();
+
+    std::cout << "Neighborhood Label Count " << std::endl;
+
+
+    for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
+        visited.push_back(false);
+    }
+
+    studyPerformance(query_graph, data_graph);
+
+}
+
+/*int main(int argc, char** argv) {
+
     std::string input_query_graph_file = "../tests/basic_query_graph.graph";
     std::string input_data_graph_file = "../tests/formatted_graph_16384.graph";
 
@@ -433,4 +467,4 @@ int main(int argc, char** argv) {
 
     studyPerfomance(query_graph, data_graph);
 
-}
+}*/

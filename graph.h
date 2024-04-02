@@ -16,6 +16,7 @@ private:
     ui max_degree;
     ui max_label_frequency;
 
+    ui* degrees;
     ui* offsets;
     VertexID * neighbors;
     ui* matching_order_idx;
@@ -63,6 +64,7 @@ public:
 
 public:
     void loadGraphFromFile(const std::string& file_path);
+    void loadGraphFromFileWithEdge(const std::string& file_path);
     void printGraphMetaData();
     void setMatchingOrderIndex(std::vector<ui> matching_order);
 
@@ -187,6 +189,41 @@ public:
         }
 
         return false;
+    }
+
+    void printGraphData(){
+
+        std::cout << " >>>>> Degree <<<<<<" << std::endl;
+
+        for(ui i = 0; i < vertices_count; i++){
+            std::cout << degrees[i] << " ";
+        }
+
+        std::cout << std::endl;
+
+        std::cout << " >>>>> Offset <<<<<<" << std::endl;
+
+        for(ui i = 0; i < vertices_count + 1; i++){
+            std::cout << offsets[i] << " ";
+        }
+
+        std::cout << std::endl;
+
+        std::cout << " >>>>> Neighbors <<<<<<" << std::endl;
+
+        for(ui i = 0; i < edges_count * 2; i++){
+            std::cout << neighbors[i] << " ";
+        }
+
+        std::cout << std::endl;
+
+        std::cout << " >>>>> Labels <<<<<<" << std::endl;
+
+        for(ui i = 0; i < vertices_count; i++){
+            std::cout << labels[i] << " ";
+        }
+
+        std::cout << std::endl;
     }
 
 };
