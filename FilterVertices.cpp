@@ -254,6 +254,7 @@ void FilterVertices::allocateBuffer(const Graph *data_graph, const Graph *query_
     candidates = new ui*[query_vertex_num]; // storing the candidates for every vertex in the query graph
 
     for (ui i = 0; i < query_vertex_num; ++i) {
+        std::cout << "Candidates Max Num : " << candidates_max_num << std::endl;
         candidates[i] = new ui[candidates_max_num];
     }
 }

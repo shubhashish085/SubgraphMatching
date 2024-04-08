@@ -1,3 +1,0 @@
-/home/kars1/Parallel_computation/SubgraphMatching/build/CMakeFiles/SubgraphMatching.out.dir
-/home/kars1/Parallel_computation/SubgraphMatching/build/CMakeFiles/edit_cache.dir
-/home/kars1/Parallel_computation/SubgraphMatching/build/CMakeFiles/rebuild_cache.dir

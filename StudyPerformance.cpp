@@ -334,6 +334,14 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
     FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
 
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
     /*std::cout << "####### Matching Order : " ;
     for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
         std::cout << matching_order[i] << " " ;
@@ -361,6 +369,7 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
     }*/
 
     //Stack Based Strategy
+    std::cout << "Exploration Started" << std::endl;
     double start_time = wtime();
     Enumerate::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
     double end_time = wtime();
@@ -406,15 +415,19 @@ int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "../tests/data_graph_1_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/data_graph_1_wo_label.graph";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/soc-LiveJournal1.txt";
+    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/roadNet-CA.txt";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
 
+    query_graph->printGraphMetaData();
+
     Graph* data_graph = new Graph();
     data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
 
-    query_graph->printGraphMetaData();
     data_graph->printGraphMetaData();
 
     std::vector<ui> matching_order;

@@ -25,6 +25,9 @@ void Graph::BuildReverseIndex() {
 }
 
 void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
+
+    std::cout << "############# Loading Graph With Edges ###############" << std::endl;
+
     std::ifstream infile(file_path);
 
     if (!infile.is_open()) {
@@ -40,7 +43,7 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
 
     while (std::getline(infile, input_line)) {
 
-        std::cout << " Input Line : " << input_line << std::endl;
+        //std::cout << " Input Line : " << input_line << std::endl;
 
         if(input_line.rfind("#", 0) == 0) {
             if(input_line.rfind("# Nodes", 0) == 0) {
@@ -67,13 +70,30 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
         }else{
             std::stringstream ss(input_line);
             std::string token;
-            int count = 0, index;
+            int count = 0, index, begin, end;
             while (!ss.eof()) {
                 std::getline(ss, token, ' ');
                 index = stoi(token);
-                degrees[index] += 1;
+                if(count == 0){
+                    begin = index;
+                    count = 1;
+                }else{
+                    end = index;
+                    count = 0;
+                }
+
             }
 
+            std::cout << " Begin : " << begin << " End : " << end << std::endl;
+
+            if(begin != end){
+                degrees[begin] += 1;
+                degrees[end] += 1;
+                std::cout << "Begin : " << begin << " Degree : " << degrees[begin] << " End: " << end << " Degree: " << degrees[end] << std::endl;
+
+            }else{
+                std::cout << "Edge Between Same Vertex" << std::endl;
+            }
         }
     }
 
@@ -89,6 +109,8 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
     neighborhood_label_count = new std::unordered_map<LabelID, ui>[vertices_count];
     labels_count = 0;
     max_degree = 0;
+
+    std::cout << "Initialization Finished" << std::endl;
 
     LabelID max_label_id = 0, begin_vtx_label, end_vtx_label;
     std::vector<ui> neighbors_offset(vertices_count, 0);// used for adjust neighbors with offset
@@ -133,7 +155,14 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
                 }else{
                     end = stoi(token);
                     count = 0;
+                    break;
                 }
+            }
+
+            line_count++;
+            if(begin > vertices_count || end > vertices_count){
+                std::cout << "Input line : " << input_line << std::endl;
+                std::cout << "Line count : " << line_count << " start index : " << begin << " end index : " << end << std::endl;
             }
 
             ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
@@ -164,6 +193,7 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
     for (auto element : labels_frequency) {
+        std::cout << " Max Label Frequency : " << element.second << std::endl;
         if (element.second > max_label_frequency) {
             max_label_frequency = element.second;
         }
@@ -175,7 +205,7 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
 
     BuildReverseIndex();
 
-    printGraphData();
+    //printGraphData();
 }
 
 void Graph::loadGraphFromFile(const std::string &file_path) {

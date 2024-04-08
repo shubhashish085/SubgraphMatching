@@ -91,7 +91,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
                                           ui *candidates_count, ui *order, TreeNode *& tree,
                                           size_t output_limit_num, size_t &call_count) {
 
-    //std::cout << " ################## explore ##################" << std::endl;
+    std::cout << " ################## explore ##################" << std::endl;
 
     size_t embedding_cnt = 0;
     int cur_depth = 0;
@@ -115,19 +115,27 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
     valid_candidate = new ui *[max_depth];
 
     ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
+    std::cout << "Max candidate count : " << max_candidate_count << std::endl;
     for (ui i = 0; i < max_depth; ++i) {
         valid_candidate[i] = new VertexID[max_candidate_count];
     }
 
+
+
+    std::cout << "Candidate count of Start Vertex : " << candidates_count[start_vertex] << std::endl;
     idx[cur_depth] = 0;
     idx_count[cur_depth] = candidates_count[start_vertex];
     std::copy(candidates[start_vertex], candidates[start_vertex] + candidates_count[start_vertex],
               valid_candidate[cur_depth]);
 
+    std::cout << "Entering Loop " << std::endl;
+
     while (true) {
+        std::cout << " idx[cur_depth] : " << idx[cur_depth] << " idx_count[cur_depth] : " << idx_count[cur_depth] << std::endl;
         while (idx[cur_depth] < idx_count[cur_depth]) {
             VertexID u = order[cur_depth];
             VertexID v = valid_candidate[cur_depth][idx[cur_depth]];
+            std::cout << " v : " << v << std::endl;
             embedding[u] = v;
             visited_vertices[v] = true;
             idx[cur_depth] += 1;
@@ -138,6 +146,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
                 visited_vertices[v] = false;
                 //printMatch(embedding, query_graph->getVerticesCount());
                 if (embedding_cnt >= output_limit_num) {
+                    std::cout << "Output Limit Exceeded" << std::endl;
                     goto EXIT;
                 }
             } else {
