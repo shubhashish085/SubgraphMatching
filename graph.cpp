@@ -55,9 +55,12 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
                     if (!(token.rfind("#", 0) == 0 || token.rfind("Nodes:", 0) == 0 || token.rfind("Edges:", 0) == 0)) {
                         if (count == 0) {
                             vertices_count = stoi(token);
-                            std::cout << " Vertex Count : " << vertices_count << std::endl;
+                            std::cout << "Vertex Count : " << vertices_count << std::endl;
                             degrees = new ui[vertices_count];
-                            std::fill(degrees, degrees + vertices_count, 0);
+                            //std::fill(degrees, degrees + vertices_count, 0);
+                            for(int i = 0; i < vertices_count; i++){
+                                degrees[i] = 0;
+                            }
                             count = 1;
                         } else {
                             edges_count = stoi(token);
@@ -72,7 +75,7 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
             std::string token;
             int count = 0, index, begin, end;
             while (!ss.eof()) {
-                std::getline(ss, token, ' ');
+                std::getline(ss, token, '\t');
                 index = stoi(token);
                 if(count == 0){
                     begin = index;
@@ -84,15 +87,11 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
 
             }
 
-            std::cout << " Begin : " << begin << " End : " << end << std::endl;
 
-            if(begin != end){
+            if(begin != end && begin < vertices_count && end < vertices_count){
                 degrees[begin] += 1;
                 degrees[end] += 1;
-                std::cout << "Begin : " << begin << " Degree : " << degrees[begin] << " End: " << end << " Degree: " << degrees[end] << std::endl;
 
-            }else{
-                std::cout << "Edge Between Same Vertex" << std::endl;
             }
         }
     }
@@ -148,7 +147,7 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
             std::string token;
             count = 0;
             while (!ss.eof()) {
-                std::getline(ss, token, ' ');
+                std::getline(ss, token, '\t');
                 if(count == 0){
                     begin = stoi(token);
                     count = 1;
@@ -160,9 +159,10 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
             }
 
             line_count++;
-            if(begin > vertices_count || end > vertices_count){
-                std::cout << "Input line : " << input_line << std::endl;
-                std::cout << "Line count : " << line_count << " start index : " << begin << " end index : " << end << std::endl;
+            if(begin >= vertices_count || end >= vertices_count || begin == end){
+                //std::cout << "Input line : " << input_line << std::endl;
+                //std::cout << "Line count : " << line_count << " start index : " << begin << " end index : " << end << std::endl;
+                continue;
             }
 
             ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array

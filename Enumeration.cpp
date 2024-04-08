@@ -135,7 +135,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
         while (idx[cur_depth] < idx_count[cur_depth]) {
             VertexID u = order[cur_depth];
             VertexID v = valid_candidate[cur_depth][idx[cur_depth]];
-            std::cout << " v : " << v << std::endl;
+            //std::cout << " v : " << v << std::endl;
             embedding[u] = v;
             visited_vertices[v] = true;
             idx[cur_depth] += 1;
