@@ -410,13 +410,32 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
 }
 
+/*int main(int argc, char** argv) {
+
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
+    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-youtube.ungraph.txt";
+    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-lj.ungraph.txt";
+
+    Graph* query_graph = new Graph();
+    query_graph->loadGraphFromFile(input_query_graph_file);
+
+    query_graph->printGraphMetaData();
+
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+
+    data_graph->printGraphMetaData();
+}*/
+
 
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    //std::string input_data_graph_file = "../tests/data_graph_1_wo_label.graph";
-    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
+    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/soc-LiveJournal1.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/roadNet-CA.txt";
 
@@ -426,7 +445,8 @@ int main(int argc, char** argv) {
     query_graph->printGraphMetaData();
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
 
     data_graph->printGraphMetaData();
 
