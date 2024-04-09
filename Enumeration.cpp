@@ -131,7 +131,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
     std::cout << "Entering Loop " << std::endl;
 
     while (true) {
-        std::cout << " idx[cur_depth] : " << idx[cur_depth] << " idx_count[cur_depth] : " << idx_count[cur_depth] << std::endl;
+        //std::cout << " idx[cur_depth] : " << idx[cur_depth] << " idx_count[cur_depth] : " << idx_count[cur_depth] << std::endl;
         while (idx[cur_depth] < idx_count[cur_depth]) {
             VertexID u = order[cur_depth];
             VertexID v = valid_candidate[cur_depth][idx[cur_depth]];
@@ -161,8 +161,12 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
         cur_depth -= 1;
         if (cur_depth < 0)
             break;
-        else
+        else if (cur_depth == 0){
+            std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
             visited_vertices[embedding[order[cur_depth]]] = false;
+        }else {
+            visited_vertices[embedding[order[cur_depth]]] = false;
+        }
     }
 
     // Release the buffer.

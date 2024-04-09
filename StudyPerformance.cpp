@@ -433,8 +433,8 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
-    //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
+    std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/soc-LiveJournal1.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/roadNet-CA.txt";

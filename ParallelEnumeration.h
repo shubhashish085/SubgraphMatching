@@ -15,6 +15,8 @@ class ParallelEnumeration {
 public:
     static ui* explore(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                                             TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count);
+    static ui** exploreWithPadding(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+                                                 TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count);
 
 };
 
