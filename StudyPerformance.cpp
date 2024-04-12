@@ -321,6 +321,39 @@ void exploreByRecursion(const Graph *data_graph, const Graph *query_graph, ui **
 
 }
 
+void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    int thread_count = 2;
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    //Stack Based Strategy
+    std::cout << "Exploration Started" << std::endl;
+    double start_time = wtime();
+    Enumerate::exploreAndAnalysis(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, vertex_participating_in_embedding,output_limit, call_count, output_file_path);
+    double end_time = wtime();
+    std::cout << "Serial Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
+    std::cout << "Time " << end_time - start_time << std::endl;
+
+}
+
+
 void studyPerformance(Graph* query_graph, Graph* data_graph){
 
     ui* matching_order = NULL;
@@ -430,6 +463,8 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 }*/
 
 
+//Main Run
+/*
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
@@ -467,18 +502,26 @@ int main(int argc, char** argv) {
 
     studyPerformance(query_graph, data_graph);
 
-}
+}*/
 
-/*int main(int argc, char** argv) {
+int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/basic_query_graph.graph";
-    std::string input_data_graph_file = "../tests/formatted_graph_16384.graph";
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
+    //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+
+    std::string output_file = "../analysis/analysis_amazon_query_3.graph";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
+    //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFile(input_data_graph_file);
+    //data_graph->loadGraphFromFile(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    data_graph->loadGraphFromFileWithWeight(input_data_graph_file);
 
     query_graph->printGraphMetaData();
     data_graph->printGraphMetaData();
@@ -498,6 +541,6 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    studyPerfomance(query_graph, data_graph);
+    analyseResult(query_graph, data_graph, output_file);
 
-}*/
+}
