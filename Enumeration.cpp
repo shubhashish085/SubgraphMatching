@@ -4,6 +4,8 @@
 
 #include "utilities.h"
 #include "Enumeration.h"
+#include <algorithm>
+#include <map>
 #include <fstream>
 
 /* Tree list implementation */
@@ -42,6 +44,54 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
 
     //std::cout << " ################## end generateValidCandidates ##################" << std::endl;
 }
+
+/*
+ * Generating Valid Candidates During Enumeration according to the previous vertex
+ * */
+void Enumerate::generateValidCandidatesWithCandidateCSR(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                    bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                    ui* candidate_offset, ui* candidate_csr){
+
+    VertexID u = order[depth];
+    ui neighbor_count = 0;
+
+    idx_count[depth] = 0;
+
+    std::map<ui, ui> valid_candidate_map;
+
+    for (ui i = 0; i < tree[u].bn_count_; i++){
+        VertexID u_nbr = tree[u].bn_[i];
+        VertexID u_nbr_v = embedding[u_nbr];
+
+        VertexID* neighbors = data_graph ->getVertexNeighbors(u_nbr_v, neighbor_count);
+
+        for(ui j = 0; j < neighbor_count; j++){
+            VertexID v = neighbors[j];
+            //isCandidateCheck
+            for(ui index = candidate_offset[v]; index < candidate_offset[v + 1]; index++){
+                if(candidate_csr[index] == u){
+
+                    if(!visited_vertices[v]){
+                        valid_candidate_map[v] = 1;
+                            //valid_candidate[depth][idx_count[depth]++] = v;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    std::map<ui, ui>::iterator it = valid_candidate_map.begin();
+
+    // Iterate through the map and print the elements
+    while (it != valid_candidate_map.end()) {
+        valid_candidate[depth][idx_count[depth]++] = it -> first;
+        ++it;
+    }
+
+
+}
+
 
 void Enumerate::generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
                                         ui **valid_candidate, bool *visited_vertices, TreeNode *&tree,
@@ -114,6 +164,10 @@ void Enumerate::analyseAndWriteResult(const std::string& file_path, const Graph 
     outputfile.close();
 }
 
+
+/*
+ * Exploration and analysis of sequential algorithm
+ */
 size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query_graph, ui **candidates,
                           ui *candidates_count, ui *order, TreeNode *& tree, ui* vertex_participation_in_embedding,
                           size_t output_limit_num, size_t &call_count, const std::string& file_path) {
@@ -148,6 +202,60 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         valid_candidate[i] = new VertexID[max_candidate_count];
     }
 
+    // candidate csr building
+    ui* candidate_track = new ui[data_graph->getVerticesCount()];
+    ui* candidate_offset = new ui[data_graph->getVerticesCount() + 1];
+    ui candidate_csr_count = 0;
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        candidate_csr_count += candidates_count[i];
+    }
+
+    ui* candidate_csr = new ui[candidate_csr_count];
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    candidate_offset[0] = 0;
+
+    for(ui i = 1; i < data_graph -> getVerticesCount() + 1; i++){
+        candidate_offset[i] = candidate_offset[i - 1] + candidate_track[i - 1];
+    }
+
+    std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<          Candidate Offset           >>>>>>>>>>>>>>>>>>>>>> " << std::endl;
+    for(ui i = 0; i < data_graph -> getVerticesCount() + 1; i++){
+        std::cout << candidate_offset[i] << " ";
+    }
+
+    std::cout << std::endl;
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_csr[candidate_offset[data_vertex] + candidate_track[data_vertex]] = i;
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    for (ui i = 0; i < data_graph->getVerticesCount() ; ++i) {
+        std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the neighbors of every vertex
+    }
+
+    std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<          Candidate CSR           >>>>>>>>>>>>>>>>>>>>>> " << std::endl;
+    for(ui i = 0; i < candidate_csr_count; i++){
+        std::cout << candidate_csr[i] << " ";
+    }
+
+    std::cout << std::endl;
+
 
 
     std::cout << "Candidate count of Start Vertex : " << candidates_count[start_vertex] << std::endl;
@@ -171,7 +279,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
             if (cur_depth == max_depth - 1) {
                 embedding_cnt += 1;
                 visited_vertices[v] = false;
-                //printMatch(embedding, query_graph->getVerticesCount());
+                printMatch(embedding, query_graph->getVerticesCount());
                 increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
                 if (embedding_cnt >= output_limit_num) {
                     std::cout << "Output Limit Exceeded" << std::endl;
@@ -181,8 +289,8 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                 call_count += 1;
                 cur_depth += 1;
                 idx[cur_depth] = 0;
-                generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                        visited_vertices, tree, order, candidates, candidates_count);
+                generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                        visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);
             }
         }
 

@@ -67,6 +67,7 @@ public:
     void loadGraphFromFileWithEdge(const std::string& file_path);
     void loadGraphFromFileWithoutStringConversion(const std::string& file_path);
     void loadGraphFromFileWithWeight(const std::string& file_path);
+    void loadDirectedGraphFromFile(const std::string& file_path);
     void printGraphMetaData();
     void setMatchingOrderIndex(std::vector<ui> matching_order);
 
@@ -213,7 +214,7 @@ public:
 
         std::cout << " >>>>> Neighbors <<<<<<" << std::endl;
 
-        for(ui i = 0; i < edges_count * 2; i++){
+        for(ui i = 0; i < edges_count; i++){
             std::cout << neighbors[i] << " ";
         }
 

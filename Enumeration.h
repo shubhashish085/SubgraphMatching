@@ -35,6 +35,10 @@ public:
     static void generateValidCandidates(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                         bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count);
 
+    static void generateValidCandidatesWithCandidateCSR(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                   bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                        ui* candidate_offset, ui* candidate_csr);
+
     static void generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
                                         ui **valid_candidate, bool *visited_vertices, TreeNode *&tree,
                                         ui *order, ui **candidates, ui *candidates_count);
