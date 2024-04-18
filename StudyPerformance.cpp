@@ -511,13 +511,14 @@ int main(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-    //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
-    std::string input_query_graph_file = "../tests/basic_query_graph.graph";
-    std::string input_data_graph_file = "../tests/basic_data_graph.graph";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+    //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
+    //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
 
 
     std::string output_file = "../analysis/sample_test.graph";
@@ -527,8 +528,8 @@ int main(int argc, char** argv) {
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFile(input_data_graph_file);
-    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFile(input_data_graph_file);
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
     //data_graph->loadGraphFromFileWithWeight(input_data_graph_file);
 
     query_graph->printGraphMetaData();
