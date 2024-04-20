@@ -3,6 +3,7 @@
 #include "graph.h"
 #include <fstream>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <sstream>
 
@@ -643,7 +644,7 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
 
 void Graph::loadDirectedGraphFromFile(const std::string& file_path){
 
-    std::cout << "############# Loading Graph With Edges ###############" << std::endl;
+    std::cout << "############# Loading Directed Graph With Edges ###############" << std::endl;
 
     std::ifstream infile(file_path);
 
@@ -697,22 +698,33 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
         }
     }
 
+    std::map<ui, ui>* adj_map = new std::map<ui, ui>[vertices_count];
+    std::map<ui, ui>::iterator it;
+
     VertexID begin, end;
 
+    ui first_vertex_id, second_vertex_id ;
 
     while(infile >> begin) {
 
         infile >> end;
 
         if (begin != end && begin < vertices_count && end < vertices_count) {
-            degrees[begin] += 1;
-            //degrees[end] += 1;
+            first_vertex_id = begin > end ? begin : end;
+            second_vertex_id = begin > end ? end : begin;
+
+            it = adj_map[first_vertex_id].find(second_vertex_id);
+            if(it == adj_map[first_vertex_id].end()){
+                adj_map[first_vertex_id][second_vertex_id] = 1;
+                degrees[begin] += 1;
+                degrees[end] += 1;
+            }
+
         }
+
     }
 
     infile.close();
-
-    std::ifstream input_file(file_path);
 
     offsets = new ui[vertices_count +  1];
     offsets[0] = 0;
@@ -747,38 +759,39 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
 
     line_count = 0;
 
-    while (std::getline(input_file, input_line)) {
-        line_count++;
-        if(line_count >= comment_line_count){
-            break;
+
+    for (ui i = 0; i < vertices_count; i++) {
+
+        begin = i;
+
+        it = adj_map[i].begin();
+
+        while (it != adj_map[i].end()) {
+
+            end = it -> first;
+
+            ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
+            neighbors[offset] = end;
+
+            offset = offsets[end] + neighbors_offset[end]; // adjusting the index of neighbor in neighbors array
+            neighbors[offset] = begin;
+
+            neighbors_offset[begin] += 1;
+            neighbors_offset[end] += 1;
+
+            if (neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()) {
+                neighborhood_label_count[begin][labels[end]] = 0;
+            }
+            neighborhood_label_count[begin][labels[end]] += 1;
+
+            if (neighborhood_label_count[end].find(labels[begin]) == neighborhood_label_count[begin].end()) {
+                neighborhood_label_count[end][labels[begin]] = 0;
+            }
+            neighborhood_label_count[end][labels[begin]] += 1;
         }
+
     }
 
-    while(input_file >> begin){ // Read edge.
-
-        input_file >> end;
-
-        line_count++;
-        if(begin >= vertices_count || end >= vertices_count || begin == end){
-            continue;
-        }
-
-        ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
-        neighbors[offset] = end;
-
-
-        neighbors_offset[begin] += 1;
-
-        if(neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()){
-            neighborhood_label_count[begin][labels[end]] = 0;
-        }
-        neighborhood_label_count[begin][labels[end]] += 1;
-
-    }
-
-    std::cout << "Line count " << line_count << std::endl;
-
-    input_file.close();
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
     for (auto element : labels_frequency) {
