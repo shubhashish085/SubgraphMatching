@@ -683,7 +683,6 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
                             std::fill(degrees, degrees + vertices_count, 0);
                             count = 1;
                         } else {
-                            edges_count = stoi(token);
                             count = 0;
                         }
                         std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
@@ -704,6 +703,7 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
     VertexID begin, end;
 
     ui first_vertex_id, second_vertex_id ;
+    edges_count = 0;
 
     while(infile >> begin) {
 
@@ -716,6 +716,7 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
             it = adj_map[first_vertex_id].find(second_vertex_id);
             if(it == adj_map[first_vertex_id].end()){
                 adj_map[first_vertex_id][second_vertex_id] = 1;
+                edges_count += 1;
                 degrees[begin] += 1;
                 degrees[end] += 1;
             }
@@ -757,8 +758,8 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
         labels_frequency[label] += 1;
     }
 
-    line_count = 0;
 
+    line_count = 0;
 
     for (ui i = 0; i < vertices_count; i++) {
 
@@ -788,9 +789,13 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
                 neighborhood_label_count[end][labels[begin]] = 0;
             }
             neighborhood_label_count[end][labels[begin]] += 1;
+
+            ++it;
         }
 
     }
+
+    std::cout << "Neighborborhood label assignment done" << std::endl;
 
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
@@ -807,7 +812,7 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
 
     BuildReverseIndex();
 
-    printGraphData();
+    //printGraphData();
 }
 
 
