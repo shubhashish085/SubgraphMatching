@@ -255,12 +255,6 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         candidate_offset[i] = candidate_offset[i - 1] + candidate_track[i - 1];
     }
 
-    /*std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<          Candidate Offset           >>>>>>>>>>>>>>>>>>>>>> " << std::endl;
-    for(ui i = 0; i < data_graph -> getVerticesCount() + 1; i++){
-        std::cout << candidate_offset[i] << " ";
-    }
-
-    std::cout << std::endl;*/
 
     std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
 
@@ -275,13 +269,6 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
     for (ui i = 0; i < data_graph->getVerticesCount() ; ++i) {
         std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the query graph parent of every vertex
     }
-
-    /*std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<          Candidate CSR           >>>>>>>>>>>>>>>>>>>>>> " << std::endl;
-    for(ui i = 0; i < candidate_csr_count; i++){
-        std::cout << candidate_csr[i] << " ";
-    }
-
-    std::cout << std::endl;*/
 
 
 
