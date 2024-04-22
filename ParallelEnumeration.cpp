@@ -5,6 +5,9 @@
 #include "ParallelEnumeration.h"
 #include "Enumeration.h"
 #include <omp.h>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
 
 #define NUM_THREADS 8
 #define PAD 8
@@ -15,18 +18,56 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
 
     std::cout << " ################## explore parallel ##################" << std::endl;
 
-    ui** embedding_cnt_array = new ui* [NUM_THREADS];
+    ui** embedding_cnt_array = new ui* [thread_count];
 
-    for(ui i = 0; i < NUM_THREADS; i++){
+    for(ui i = 0; i < thread_count; i++){
         embedding_cnt_array[i] = new ui[PAD];
+    }
+
+    ui* candidate_track = new ui[data_graph->getVerticesCount()];
+    ui* candidate_offset = new ui[data_graph->getVerticesCount() + 1];
+    ui candidate_csr_count = 0;
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        candidate_csr_count += candidates_count[i];
+    }
+
+    ui* candidate_csr = new ui[candidate_csr_count];
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    candidate_offset[0] = 0;
+
+    for(ui i = 1; i < data_graph -> getVerticesCount() + 1; i++){
+        candidate_offset[i] = candidate_offset[i - 1] + candidate_track[i - 1];
+    }
+
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_csr[candidate_offset[data_vertex] + candidate_track[data_vertex]] = i;
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    for (ui i = 0; i < data_graph->getVerticesCount() ; ++i) {
+        std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the query graph parent of every vertex
     }
 
     int max_depth = query_graph->getVerticesCount();
     VertexID start_vertex = order[0];
 
     int avg_size = candidates_count[start_vertex] / thread_count;
-
-    // Allocate the memory buffer.
 
     omp_set_num_threads(thread_count);
 
@@ -38,9 +79,11 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
 
         std::cout << "Thread id : " << th_id << std::endl;
 
-        if(th_id == NUM_THREADS - 1){
+        if(th_id == thread_count - 1){
             remaining_size = candidates_count[start_vertex];
         }
+
+        //Allocate Memory Buffer
 
         ui *idx = new ui[max_depth];
         ui *idx_count = new ui[max_depth];
@@ -80,8 +123,10 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
                     call_count += 1;
                     cur_depth += 1;
                     idx[cur_depth] = 0;
-                    Enumerate::generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                       visited_vertices, tree, order, candidates, candidates_count);
+                    /*Enumerate::generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                       visited_vertices, tree, order, candidates, candidates_count);*/
+                    Enumerate::generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                            visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);
                 }
             }
 
@@ -109,6 +154,23 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
     return embedding_cnt_array;
 }
 
+void ParallelEnumeration::writeResult(const std::string& file_path, int& thread_count, size_t &call_count, size_t &embedding_count){
+    std::ofstream outputfile;
+    outputfile.open(file_path, std::ios::app);
+
+    outputfile << "----------------------------------------" << std::endl;
+    outputfile << std::endl;
+
+    outputfile << "Thread Count : " << thread_count << std::endl;
+    outputfile << "Embedding Count : " << embedding_count << std::endl;
+    outputfile << "Operation Count : " << call_count << std::endl;
+    outputfile << std::endl;
+
+    outputfile << "----------------------------------------" << std::endl;
+
+    outputfile.flush();
+    outputfile.close();
+}
 
 
 ui* ParallelEnumeration::explore(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
