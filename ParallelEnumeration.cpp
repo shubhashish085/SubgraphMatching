@@ -155,11 +155,15 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
 
     }
 
+    std::cout << "----------------------------------------------------------" << std::endl;
+
     std::cout << "Thread wise time spent for " << thread_count << " threads" << std::endl;
 
     for(ui i = 0; i < thread_count; i++){
         std::cout << "Thread ID : " << i << " Spent Time : " << thread_wise_time[i] << std::endl;
     }
+
+    std::cout << "-----------------------------------------------------------" << std::endl;
 
     return embedding_cnt_array;
 }
