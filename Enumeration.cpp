@@ -294,7 +294,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                 embedding_cnt += 1;
                 visited_vertices[v] = false;
                 //printMatch(embedding, query_graph->getVerticesCount());
-                increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
+                //increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
                 if (embedding_cnt >= output_limit_num) {
                     std::cout << "Output Limit Exceeded" << std::endl;
                     goto EXIT;
@@ -314,7 +314,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         if (cur_depth < 0)
             break;
         else if (cur_depth == 0){
-            std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
+            //std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
             visited_vertices[embedding[order[cur_depth]]] = false;
         }else {
             visited_vertices[embedding[order[cur_depth]]] = false;
@@ -325,7 +325,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
 
     // Release the buffer.
     EXIT:
-    analyseAndWriteResult(file_path, data_graph, query_graph, vertex_participation_in_embedding);
+    //analyseAndWriteResult(file_path, data_graph, query_graph, vertex_participation_in_embedding);
     delete[] idx;
     delete[] idx_count;
     delete[] embedding;

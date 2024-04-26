@@ -4,6 +4,7 @@
 
 #include "ParallelEnumeration.h"
 #include "Enumeration.h"
+#include "wtime.h"
 #include <omp.h>
 #include <algorithm>
 #include <iostream>
@@ -19,6 +20,7 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
     std::cout << " ################## explore parallel ##################" << std::endl;
 
     ui** embedding_cnt_array = new ui* [thread_count];
+    double* thread_wise_time = new double [thread_count];
 
     for(ui i = 0; i < thread_count; i++){
         embedding_cnt_array[i] = new ui[PAD];
@@ -73,6 +75,7 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
 
 #pragma omp parallel
     {
+        double start_time = wtime();
 
         int th_id = omp_get_thread_num();
         int remaining_size = (th_id * avg_size) + avg_size;
@@ -123,8 +126,6 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
                     call_count += 1;
                     cur_depth += 1;
                     idx[cur_depth] = 0;
-                    /*Enumerate::generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                       visited_vertices, tree, order, candidates, candidates_count);*/
                     Enumerate::generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                             visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);
                 }
@@ -136,6 +137,9 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
             else
                 visited_vertices[embedding[order[cur_depth]]] = false;
         }
+
+        double end_time = wtime();
+        thread_wise_time[th_id] = end_time - start_time;
 
         // Release the buffer.
         EXIT:
@@ -149,6 +153,12 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
 
         delete[] valid_candidate;
 
+    }
+
+    std::cout << "Thread wise time spent for " << thread_count << " threads" << std::endl;
+
+    for(ui i = 0; i < thread_count; i++){
+        std::cout << "Thread ID : " << i << " Spent Time : " << thread_wise_time[i] << std::endl;
     }
 
     return embedding_cnt_array;
