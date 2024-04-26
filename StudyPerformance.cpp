@@ -580,6 +580,6 @@ int main(int argc, char** argv) {
     }
 
     //analyseResult(query_graph, data_graph, output_file);
-    analyseParallelization(query_graph, data_graph, output_file)
+    analyseParallelization(query_graph, data_graph, output_file);
 
 }
