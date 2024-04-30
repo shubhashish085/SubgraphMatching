@@ -360,7 +360,9 @@ void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::st
     ui** candidates = NULL;
     ui* candidates_count = NULL;
     size_t call_count = 0;
-    int thread_count[] = {2, 4, 8, 16};
+    ui loop_count = 1;
+    //int thread_count[] = {2, 4, 8, 16};
+    int thread_count[] = {2};
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
     ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
@@ -379,7 +381,7 @@ void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::st
     double start_time, end_time;
 
     std::cout << "Exploration Started" << std::endl;
-    for (ui i = 0; i < 4; i++){
+    for (ui i = 0; i < loop_count; i++){
 
         embedding_count = 0;
         call_count = 0;
@@ -543,13 +545,13 @@ int main(int argc, char** argv) {
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
 
 
-    std::string output_file = "../analysis/sample_test.txt";
+    std::string output_file = "../analysis/sample_test_parallel.txt";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);

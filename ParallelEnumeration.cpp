@@ -138,8 +138,6 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
                 visited_vertices[embedding[order[cur_depth]]] = false;
         }
 
-        double end_time = wtime();
-        thread_wise_time[th_id] = end_time - start_time;
 
         // Release the buffer.
         EXIT:
@@ -152,6 +150,9 @@ ui** ParallelEnumeration::exploreWithPadding(const Graph *data_graph, const Grap
         }
 
         delete[] valid_candidate;
+
+        double end_time = wtime();
+        thread_wise_time[th_id] = end_time - start_time;
 
     }
 
