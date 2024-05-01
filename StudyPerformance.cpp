@@ -353,6 +353,66 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
 
 }
 
+void analyseDegree(Graph* query_graph, Graph* data_graph){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    ui loop_count = 4;
+    int thread_count[] = {2, 4, 8, 16};
+
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    VertexID start_vertex = matching_order[0];
+
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    ui* cand_degree_offset = new ui[candidates_count[start_vertex] + 1];
+    ui* thread_wise_degree = NULL;
+    cand_degree_offset[0] = 0;
+
+    std::cout << "Exploration Started" << std::endl;
+    for (ui i = 0; i < loop_count; i++){
+
+        ui avg_size = candidates_count[start_vertex] / thread_count[i];
+        thread_wise_degree = new ui[thread_count[i]];
+
+        for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+            cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j]);
+        }
+
+
+        for(ui j = 0; j < thread_count[i]; j++){
+            if(j == thread_count[i] - 1){
+                thread_wise_degree[j] = cand_degree_offset[candidates_count[start_vertex]] - cand_degree_offset[j * avg_size];
+            }else {
+                thread_wise_degree[j] = cand_degree_offset[(j + 1) * avg_size] - cand_degree_offset[j * avg_size];
+            }
+        }
+
+        std::cout << "-----------------------------------------" << std::endl;
+        std::cout << "Number of Threads : " << thread_count[i] << std::endl;
+        std::cout << "-----------------------------------------" << std::endl;
+        for(ui j = 0; j < thread_count[i]; j++){
+            std::cout << "Thread No " << j  << " :: degree summation : " << thread_wise_degree[j] << std::endl;
+        }
+
+        std::cout << "-----------------------------------------" << std::endl;
+
+    }
+
+}
+
+
+
 void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
 
     ui* matching_order = NULL;
@@ -582,6 +642,7 @@ int main(int argc, char** argv) {
     }
 
     //analyseResult(query_graph, data_graph, output_file);
-    analyseParallelization(query_graph, data_graph, output_file);
+    //analyseParallelization(query_graph, data_graph, output_file);
+    analyseDegree(query_graph, data_graph);
 
 }
