@@ -377,18 +377,27 @@ void analyseDegree(Graph* query_graph, Graph* data_graph){
 
     ui* cand_degree_offset = new ui[candidates_count[start_vertex] + 1];
     ui* thread_wise_degree = NULL;
+    ui* candidate_limit = NULL;
+    ui* allocated_degree_dist = NULL;
     cand_degree_offset[0] = 0;
+
+    ui total_degree = 0;
+    ui avg_degree = 0;
 
     std::cout << "Exploration Started" << std::endl;
     for (ui i = 0; i < loop_count; i++){
 
         ui avg_size = candidates_count[start_vertex] / thread_count[i];
         thread_wise_degree = new ui[thread_count[i]];
+        candidate_limit = new ui[thread_count[i]];
+        allocated_degree_dist = new ui[thread_count[i]];
 
         for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
-            cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j]);
+            cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j - 1]);
         }
 
+        total_degree = cand_degree_offset[candidates_count[start_vertex]];
+        avg_degree = total_degree / thread_count[i];
 
         for(ui j = 0; j < thread_count[i]; j++){
             if(j == thread_count[i] - 1){
@@ -398,14 +407,39 @@ void analyseDegree(Graph* query_graph, Graph* data_graph){
             }
         }
 
+        ui last_thread_degree_offset = 0;
+        ui thread_idx = 0;
+
+        for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+            if(thread_idx == thread_count[i] - 1){
+                allocated_degree_dist[thread_idx] = cand_degree_offset[candidates_count[start_vertex]] - last_thread_degree_offset;
+                candidate_limit[thread_idx++] = candidates_count[start_vertex];
+                last_thread_degree_offset = cand_degree_offset[candidates_count[start_vertex]];
+                break;
+            }else if(j == candidates_count[start_vertex]){
+                allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
+                candidate_limit[thread_idx++] = j;
+                last_thread_degree_offset = cand_degree_offset[j];
+            }else if(cand_degree_offset[j] - last_thread_degree_offset >= avg_degree){
+                allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
+                candidate_limit[thread_idx++] = j;
+                last_thread_degree_offset = cand_degree_offset[j];
+            }
+        }
+
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << "Number of Threads : " << thread_count[i] << std::endl;
         std::cout << "-----------------------------------------" << std::endl;
         for(ui j = 0; j < thread_count[i]; j++){
-            std::cout << "Thread No " << j  << " :: degree summation : " << thread_wise_degree[j] << std::endl;
+            std::cout << "Thread No " << j  << " :: even degree summation : " << thread_wise_degree[j] << std::endl;
+            std::cout << "Thread No " << j  << " :: candidate limit : " << candidate_limit[j] << " allocated_degree_dist : " << allocated_degree_dist[j] << std::endl;
         }
 
         std::cout << "-----------------------------------------" << std::endl;
+
+        delete[] thread_wise_degree;
+        delete[] candidate_limit;
+        delete[] allocated_degree_dist;
 
     }
 
