@@ -2,6 +2,7 @@
 // Created by antu on 2/12/24.
 //
 
+#include "matchingcommand.h"
 #include "graph.h"
 #include "backtracking.h"
 #include "FilterVertices.h"
@@ -10,6 +11,7 @@
 #include "ParallelEnumeration.h"
 #include "wtime.h"
 #include <limits>
+#include <fstream>
 #define INVALID_VERTEX_ID 100000000
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
@@ -346,10 +348,24 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
     //Stack Based Strategy
     std::cout << "Exploration Started" << std::endl;
     double start_time = wtime();
-    Enumerate::exploreAndAnalysis(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, vertex_participating_in_embedding,output_limit, call_count, output_file_path);
+    embedding_count = Enumerate::exploreAndAnalysis(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, vertex_participating_in_embedding,output_limit, call_count, output_file_path);
     double end_time = wtime();
     std::cout << "Serial Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
     std::cout << "Time " << end_time - start_time << std::endl;
+
+    std::ofstream outputfile;
+    outputfile.open(output_file_path, std::ios::app);
+
+    outputfile << "Enumerate time (seconds): " << end_time - start_time << std::endl;
+    outputfile << "#Embeddings: " << embedding_count << std::endl;
+    outputfile << "Call Count: " << call_count << std::endl;
+
+    outputfile << "-------------------------------- End -----------------------------------" <<std::endl;
+
+
+    outputfile.flush();
+    outputfile.close();
+
 
 }
 
@@ -635,17 +651,22 @@ int main(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    MatchingCommand command(argc, argv);
+    std::string input_query_graph_file = command.getQueryGraphFilePath();
+    std::string input_data_graph_file = command.getDataGraphFilePath();
+    std::string output_performance_file = command.getOutputFilePath();
+
+    //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
+    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
 
 
-    std::string output_file = "../analysis/sample_test_parallel.txt";
+    //std::string output_file = "../analysis/sample_test_parallel.txt";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
@@ -675,7 +696,7 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    analyseResult(query_graph, data_graph, output_file);
+    analyseResult(query_graph, data_graph, output_performance_file);
     //analyseParallelization(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
 

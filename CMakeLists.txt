@@ -13,6 +13,10 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         backtracking.h
         FilterVertices.h
         FilterVertices.cpp
+        commandparser.h
+        commandparser.cpp
+        matchingcommand.h
+        matchingcommand.cpp
         GeneratingFilterPlan.h
         GeneratingFilterPlan.cpp
         Enumeration.h
