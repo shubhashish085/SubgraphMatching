@@ -353,6 +353,8 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
 
 }
 
+
+
 void analyseDegree(Graph* query_graph, Graph* data_graph){
 
     ui* matching_order = NULL;
@@ -388,9 +390,9 @@ void analyseDegree(Graph* query_graph, Graph* data_graph){
     for (ui i = 0; i < loop_count; i++){
 
         ui avg_size = candidates_count[start_vertex] / thread_count[i];
-        thread_wise_degree = new ui[thread_count[i]];
+        //thread_wise_degree = new ui[thread_count[i]];
         candidate_limit = new ui[thread_count[i]];
-        allocated_degree_dist = new ui[thread_count[i]];
+        //allocated_degree_dist = new ui[thread_count[i]];
 
         for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
             cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j - 1]);
@@ -399,29 +401,29 @@ void analyseDegree(Graph* query_graph, Graph* data_graph){
         total_degree = cand_degree_offset[candidates_count[start_vertex]];
         avg_degree = total_degree / thread_count[i];
 
-        for(ui j = 0; j < thread_count[i]; j++){
+        /*for(ui j = 0; j < thread_count[i]; j++){
             if(j == thread_count[i] - 1){
                 thread_wise_degree[j] = cand_degree_offset[candidates_count[start_vertex]] - cand_degree_offset[j * avg_size];
             }else {
                 thread_wise_degree[j] = cand_degree_offset[(j + 1) * avg_size] - cand_degree_offset[j * avg_size];
             }
-        }
+        }*/
 
         ui last_thread_degree_offset = 0;
         ui thread_idx = 0;
 
         for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
             if(thread_idx == thread_count[i] - 1){
-                allocated_degree_dist[thread_idx] = cand_degree_offset[candidates_count[start_vertex]] - last_thread_degree_offset;
+                //allocated_degree_dist[thread_idx] = cand_degree_offset[candidates_count[start_vertex]] - last_thread_degree_offset;
                 candidate_limit[thread_idx++] = candidates_count[start_vertex];
                 last_thread_degree_offset = cand_degree_offset[candidates_count[start_vertex]];
                 break;
             }else if(j == candidates_count[start_vertex]){
-                allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
+                //allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
                 candidate_limit[thread_idx++] = j;
                 last_thread_degree_offset = cand_degree_offset[j];
             }else if(cand_degree_offset[j] - last_thread_degree_offset >= avg_degree){
-                allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
+                //allocated_degree_dist[thread_idx] = cand_degree_offset[j] - last_thread_degree_offset;
                 candidate_limit[thread_idx++] = j;
                 last_thread_degree_offset = cand_degree_offset[j];
             }
@@ -437,14 +439,185 @@ void analyseDegree(Graph* query_graph, Graph* data_graph){
 
         std::cout << "-----------------------------------------" << std::endl;
 
-        delete[] thread_wise_degree;
-        delete[] candidate_limit;
-        delete[] allocated_degree_dist;
+        //delete[] thread_wise_degree;
+        //delete[] candidate_limit;
+        //delete[] allocated_degree_dist;
 
     }
 
 }
 
+void analyseParallelizationForWeakScaling(Graph* query_graph, Graph* data_graph, const std::string& output_file_path, int& thread_count){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    VertexID start_vertex = matching_order[0];
+
+    ui* cand_degree_offset = new ui[candidates_count[start_vertex] + 1];
+    cand_degree_offset[0] = 0;
+    ui* candidate_limit = NULL;
+
+    for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+        cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j - 1]);
+    }
+
+    //Parallel Strategy
+    double start_time, end_time;
+
+    std::cout << "Exploration Started" << std::endl;
+
+
+    candidate_limit = new ui[thread_count];
+
+    ui total_degree = cand_degree_offset[candidates_count[start_vertex]];
+    ui avg_degree = total_degree / thread_count;
+
+    ui last_thread_degree_offset = 0;
+    ui thread_idx = 0;
+
+    for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+        if(thread_idx == thread_count - 1){
+            candidate_limit[thread_idx++] = candidates_count[start_vertex];
+            last_thread_degree_offset = cand_degree_offset[candidates_count[start_vertex]];
+            break;
+        }else if(j == candidates_count[start_vertex]){
+            candidate_limit[thread_idx++] = j;
+            last_thread_degree_offset = cand_degree_offset[j];
+        }else if(cand_degree_offset[j] - last_thread_degree_offset >= avg_degree){
+            candidate_limit[thread_idx++] = j;
+            last_thread_degree_offset = cand_degree_offset[j];
+        }
+    }
+
+    std::cout << "Candidate Limit : " << std::endl;
+
+    for (ui j = 0; j < thread_idx; j++){
+        std::cout << candidate_limit[j] << " " ;
+    }
+    std::cout << "--------------------------" << std::endl;
+
+    embedding_count = 0;
+    call_count = 0;
+
+    start_time = wtime();
+    ui** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
+                                                                              candidates_count, matching_order, query_tree, output_limit, call_count, thread_count, candidate_limit);
+    for(ui idx = 0; idx < thread_count; idx++){
+        embedding_count += embedding_cnt_array[idx][0];
+    }
+
+    end_time = wtime();
+    ParallelEnumeration::writeResult(output_file_path, thread_count, call_count, embedding_count);
+
+    std::cout << "Time " << end_time - start_time << std::endl;
+
+
+}
+
+
+void analyseParallelizationWithLoadBalance(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    ui loop_count = 4;
+    int thread_count[] = {2, 4, 8, 16};
+    //int thread_count[] = {2};
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    VertexID start_vertex = matching_order[0];
+
+    ui* cand_degree_offset = new ui[candidates_count[start_vertex] + 1];
+    cand_degree_offset[0] = 0;
+    ui* candidate_limit = NULL;
+
+    for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+        cand_degree_offset[j] = cand_degree_offset[j - 1] + data_graph->getVertexDegree(candidates[start_vertex][j - 1]);
+    }
+
+    //Parallel Strategy
+    double start_time, end_time;
+
+    std::cout << "Exploration Started" << std::endl;
+    for (ui i = 0; i < loop_count; i++){
+
+        candidate_limit = new ui[thread_count[i]];
+
+        ui total_degree = cand_degree_offset[candidates_count[start_vertex]];
+        ui avg_degree = total_degree / thread_count[i];
+
+        ui last_thread_degree_offset = 0;
+        ui thread_idx = 0;
+
+        for(ui j = 1; j < candidates_count[start_vertex] + 1; j++){
+            if(thread_idx == thread_count[i] - 1){
+                candidate_limit[thread_idx++] = candidates_count[start_vertex];
+                last_thread_degree_offset = cand_degree_offset[candidates_count[start_vertex]];
+                break;
+            }else if(j == candidates_count[start_vertex]){
+                candidate_limit[thread_idx++] = j;
+                last_thread_degree_offset = cand_degree_offset[j];
+            }else if(cand_degree_offset[j] - last_thread_degree_offset >= avg_degree){
+                candidate_limit[thread_idx++] = j;
+                last_thread_degree_offset = cand_degree_offset[j];
+            }
+        }
+
+        std::cout << "Candidate Limit : " << std::endl;
+
+        for (ui j = 0; j < thread_idx; j++){
+            std::cout << candidate_limit[j] << " " ;
+        }
+        std::cout << "--------------------------" << std::endl;
+
+        embedding_count = 0;
+        call_count = 0;
+
+        start_time = wtime();
+        ui** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
+                                   candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i], candidate_limit);
+        for(ui idx = 0; idx < thread_count[i]; idx++){
+            embedding_count += embedding_cnt_array[idx][0];
+        }
+
+        end_time = wtime();
+        ParallelEnumeration::writeResult(output_file_path, thread_count[i], call_count, embedding_count);
+
+        std::cout << "Time " << end_time - start_time << std::endl;
+    }
+
+}
 
 
 void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
@@ -636,16 +809,59 @@ int main(int argc, char** argv) {
 int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
+
+    int division_factor[] = {2, 4, 8, 16};
+
+    std::string output_file = "../analysis/sample_test_parallel_weak_scaling.txt";
+
+    Graph* query_graph = new Graph();
+    query_graph->loadGraphFromFile(input_query_graph_file);
+    //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
+
+    for(ui i = 0; i < 4; i++) {
+
+        Graph *data_graph = new Graph();
+        data_graph->loadGraphFromFileForWeakScaling(input_data_graph_file, division_factor[i]);
+
+        query_graph->printGraphMetaData();
+        data_graph->printGraphMetaData();
+
+        std::vector<ui> matching_order;
+        std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
+
+        std::vector<bool> visited;
+        int *parent_vtr;
+
+        std::unordered_map<VertexID, ui> *vertex_map = query_graph->getNeighborhoodLabelCount();
+
+        std::cout << "Neighborhood Label Count " << std::endl;
+
+
+        for (ui i = 0; i < query_graph->getVerticesCount(); i++) {
+            visited.push_back(false);
+        }
+
+        analyseParallelizationForWeakScaling(query_graph, data_graph, output_file, division_factor[i]);
+    }
+
+}
+
+
+
+/*int main(int argc, char** argv) {
+
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
 
 
-    std::string output_file = "../analysis/sample_test_parallel.txt";
+    std::string output_file = "../analysis/sample_test_parallel_lb.txt";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
@@ -677,6 +893,7 @@ int main(int argc, char** argv) {
 
     //analyseResult(query_graph, data_graph, output_file);
     //analyseParallelization(query_graph, data_graph, output_file);
-    analyseDegree(query_graph, data_graph);
+    analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
+    //analyseDegree(query_graph, data_graph);
 
-}
+}*/
