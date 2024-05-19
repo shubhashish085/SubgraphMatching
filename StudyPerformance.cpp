@@ -856,6 +856,7 @@ int main(int argc, char** argv) {
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
     std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
+
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
@@ -891,9 +892,9 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    //analyseResult(query_graph, data_graph, output_file);
+    analyseResult(query_graph, data_graph, output_file);
     //analyseParallelization(query_graph, data_graph, output_file);
-    analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
+    //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
 
 }*/
