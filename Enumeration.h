@@ -39,6 +39,18 @@ public:
                                                    bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
                                                         ui* candidate_offset, ui* candidate_csr);
 
+    static void generateValidCandidatesWithBinarySearch(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                        bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                        ui* candidate_offset, ui* candidate_csr);
+
+    static void generateValidCandidatesWithSetIntersection(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                           bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                           ui* candidate_offset, ui* candidate_csr);
+
+    static void generateValidCandidatesWithSetIntersection_tp(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                              bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                              ui* candidate_offset, ui* candidate_csr, VertexID* intersection_array);
+
     static void generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
                                         ui **valid_candidate, bool *visited_vertices, TreeNode *&tree,
                                         ui *order, ui **candidates, ui *candidates_count);
