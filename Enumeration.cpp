@@ -117,7 +117,7 @@ void Enumerate::generateValidCandidatesWithCandidateCSR(const Graph* data_graph,
 }
 
 /*
- * Generating Valid Candidates During Enumeration according to the previous vertex
+ * Generating Valid Candidates During Enumeration according to the previous vertex using Set intersection and two pointer
  * */
 void Enumerate::generateValidCandidatesWithSetIntersection_tp(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                                            bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,

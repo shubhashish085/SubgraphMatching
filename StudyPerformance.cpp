@@ -534,31 +534,7 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
     std::cout << std::endl;
 
-    /*std::cout << "####### Matching Order : " ;
-    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << matching_order[i] << " " ;
-    }
 
-    std::cout << std::endl;
-
-    std::cout << "####### Candidates  "  << std::endl;
-    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << "Candidate count of  " << i << " : " << candidates_count[i] << "----";
-        for(ui j = 0; j < candidates_count[i]; j++){
-            std::cout << " " << candidates[i][j];
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << std::endl;
-
-    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << " Tree Node : " << i  << " back neighbor count : " << query_tree[i].bn_count_ << std::endl;
-        for(ui j = 0; j < query_tree[i].bn_count_; j++){
-            std::cout << query_tree[i].bn_[j] << " " ;
-        }
-        std::cout << std::endl;
-    }*/
 
     //Stack Based Strategy
     std::cout << "Exploration Started" << std::endl;
@@ -696,8 +672,8 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    analyseResult(query_graph, data_graph, output_performance_file);
-    //analyseParallelization(query_graph, data_graph, output_file);
-    //analyseDegree(query_graph, data_graph);
+    //analyseResult(query_graph, data_graph, output_performance_file);
+    //analyseParallelization(query_graph, data_graph, output_performance_file);
+    analyseDegree(query_graph, data_graph);
 
 }
