@@ -68,6 +68,7 @@ ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, con
     }
 
     int max_depth = query_graph->getVerticesCount();
+    ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
     VertexID start_vertex = order[0];
 
     omp_set_num_threads(thread_count);
@@ -90,6 +91,7 @@ ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, con
         ui *idx = new ui[max_depth];
         ui *idx_count = new ui[max_depth];
         ui *embedding = new ui[max_depth];
+        VertexID* intersection_result = new VertexID[max_candidate_count];
         bool *visited_vertices = new bool[data_graph->getVerticesCount()];
         std::fill(visited_vertices, visited_vertices + data_graph->getVerticesCount(), false);
         VertexID **valid_candidate = new ui *[max_depth];
@@ -125,8 +127,10 @@ ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, con
                     call_count += 1;
                     cur_depth += 1;
                     idx[cur_depth] = 0;
-                    Enumerate::generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                                       visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);
+                    /*Enumerate::generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                       visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
+                    Enumerate::generateValidCandidatesWithSetIntersection_tp(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                  visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr, intersection_result);
                 }
             }
 

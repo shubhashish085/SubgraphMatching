@@ -3,6 +3,7 @@
 //
 
 #include "matchingcommand.h"
+#include "BuildTable.h"
 #include "graph.h"
 #include "backtracking.h"
 #include "FilterVertices.h"
@@ -10,9 +11,13 @@
 #include "Enumeration.h"
 #include "ParallelEnumeration.h"
 #include "wtime.h"
+#include <chrono>
 #include <limits>
 #include <fstream>
+
 #define INVALID_VERTEX_ID 100000000
+#define BYTESTOMB(memory_cost) ((memory_cost)/(double)(1024 * 1024))
+#define NANOSECTOSEC(elapsed_time) ((elapsed_time)/(double)1000000000)
 
 bool filter_by_neighborhood_label_count(std::unordered_map<LabelID, ui>& d_vtx_nlc, std::unordered_map<LabelID, ui>& q_vtx_nlc){
 
@@ -335,7 +340,12 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
     size_t  embedding_count = 0;
     ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double preprocessing_time_in_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
     std::cout << "####### Candidate count  : " ;
 
@@ -361,6 +371,10 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
     outputfile << "Call Count: " << call_count << std::endl;
 
     outputfile << "-------------------------------- End -----------------------------------" <<std::endl;
+
+    size_t memory = BuildTable::computeMemoryCostInBytes(query_graph, data_graph, candidates_count);
+    std::cout << "Amount of Memory Used(MB) : " << BYTESTOMB(memory) << std::endl;
+    std::cout << "Preprocessing Time : " << NANOSECTOSEC(preprocessing_time_in_ns) << std::endl;
 
 
     outputfile.flush();
@@ -811,21 +825,25 @@ int main(int argc, char** argv) {
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
     //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
 
-    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
+    //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
 
     int division_factor[] = {2, 4, 8, 16};
 
-    std::string output_file = "../analysis/sample_test_parallel_weak_scaling.txt";
+    //std::string output_file = "../analysis/sample_test_parallel_weak_scaling.txt";
 
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
-    for(ui i = 0; i < 4; i++) {
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
 
-        Graph *data_graph = new Graph();
-        data_graph->loadGraphFromFileForWeakScaling(input_data_graph_file, division_factor[i]);
+    //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
+    analyseResult(query_graph, data_graph, output_performance_file);
+
+
+    /*for(ui i = 0; i < 4; i++) {
 
         query_graph->printGraphMetaData();
         data_graph->printGraphMetaData();
@@ -834,20 +852,14 @@ int main(int argc, char** argv) {
         std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
 
         std::vector<bool> visited;
-        int *parent_vtr;
-
-        std::unordered_map<VertexID, ui> *vertex_map = query_graph->getNeighborhoodLabelCount();
-
-        std::cout << "Neighborhood Label Count " << std::endl;
-
 
         for (ui i = 0; i < query_graph->getVerticesCount(); i++) {
             visited.push_back(false);
         }
 
         //analyseParallelizationForWeakScaling(query_graph, data_graph, output_file, division_factor[i]);
-        analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
-    }
+
+    }*/
 
 }
 

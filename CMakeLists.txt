@@ -11,6 +11,8 @@ set(CMAKE_CXX_FLAGS
 set(SUBGRAPH_MATCHING_FILE_LIST
         backtracking.cpp
         backtracking.h
+        BuildTable.h
+        BuildTable.cpp
         FilterVertices.h
         FilterVertices.cpp
         commandparser.h

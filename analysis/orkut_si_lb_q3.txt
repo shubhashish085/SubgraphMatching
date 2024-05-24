@@ -1,0 +1,81 @@
+----------------------------------------
+
+Thread Count : 2
+Embedding Count : 3765399498
+Operation Count : 233925792
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 4
+Embedding Count : 3765399498
+Operation Count : 226994777
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 8
+Embedding Count : 3765399498
+Operation Count : 214650567
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 16
+Embedding Count : 3765399498
+Operation Count : 193159203
+
+----------------------------------------
+
+----------------------------------------------------------
+Thread wise time spent for 2 threads
+Thread ID : 0 Spent Time : 203.911
+Thread ID : 1 Spent Time : 137.793
+-----------------------------------------------------------
+Time 203.949
+Candidate Limit : 
+539432 1132896 1774960 3004605 --------------------------
+----------------------------------------------------------
+Thread wise time spent for 4 threads
+Thread ID : 0 Spent Time : 95.2558
+Thread ID : 1 Spent Time : 116.928
+Thread ID : 2 Spent Time : 91.9936
+Thread ID : 3 Spent Time : 52.3889
+-----------------------------------------------------------
+Time 116.966
+Candidate Limit : 
+224026 539432 983756 1132896 1407404 1774960 2307356 3004605 --------------------------
+----------------------------------------------------------
+Thread wise time spent for 8 threads
+Thread ID : 0 Spent Time : 55.8379
+Thread ID : 1 Spent Time : 53.1329
+Thread ID : 2 Spent Time : 42.8187
+Thread ID : 3 Spent Time : 87.1324
+Thread ID : 4 Spent Time : 57.2605
+Thread ID : 5 Spent Time : 47.3728
+Thread ID : 6 Spent Time : 33.1942
+Thread ID : 7 Spent Time : 28.3984
+-----------------------------------------------------------
+Time 87.1701
+Candidate Limit : 
+89670 224028 364566 539439 764201 983758 1041483 1132898 1260127 1407415 1583530 1774971 2037703 2307380 2625216 3004605 --------------------------
+----------------------------------------------------------
+Thread wise time spent for 16 threads
+Thread ID : 0 Spent Time : 40.8849
+Thread ID : 1 Spent Time : 26.6377
+Thread ID : 2 Spent Time : 38.9846
+Thread ID : 3 Spent Time : 30.3451
+Thread ID : 4 Spent Time : 23.6914
+Thread ID : 5 Spent Time : 34.3184
+Thread ID : 6 Spent Time : 56.9388
+Thread ID : 7 Spent Time : 46.3856
+Thread ID : 8 Spent Time : 37.8995
+Thread ID : 9 Spent Time : 30.2249
+Thread ID : 10 Spent Time : 28.4938
+Thread ID : 11 Spent Time : 26.7078
+Thread ID : 12 Spent Time : 20.271
+Thread ID : 13 Spent Time : 18.0828
+Thread ID : 14 Spent Time : 17.279
+Thread ID : 15 Spent Time : 15.6935
+-----------------------------------------------------------
+Time 57.0005
