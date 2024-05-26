@@ -345,6 +345,7 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
     FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
 
     auto end = std::chrono::high_resolution_clock::now();
+
     double preprocessing_time_in_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
     std::cout << "####### Candidate count  : " ;

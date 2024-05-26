@@ -15,6 +15,34 @@ void Utilities::set_copy(VertexID *l_array, ui &l_count, VertexID *valid_candida
     return;
 }
 
+void Utilities::set_intersection_with_maximum_bound(VertexID *result, ui l_length, VertexID *r_array, ui r_length,
+                                    ui &set_ints_length, ui max) {
+    int i = 0, j = 0;
+    set_ints_length = 0;
+
+    while (i < l_length && j < r_length) {
+
+        if (result[i] < r_array[j]) {
+            i++;
+            if(result[i] > max){
+                break;
+            }
+        }
+        else if (r_array[j] < result[i]) {
+            j++;
+            if(r_array[j] > max){
+                break;
+            }
+        }
+        else
+        {
+            result[set_ints_length++] = r_array[j];
+            i++;
+            j++;
+        }
+    }
+}
+
 void Utilities::set_intersection_tp(VertexID * result, ui l_length, VertexID * r_array, ui r_length, ui& set_ints_length) {
 
     int i = 0, j = 0;
