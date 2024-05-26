@@ -1,0 +1,11 @@
+Enumerate time (seconds): 0.124405
+#Embeddings: 1933960
+Call Count: 4837176
+-------------------------------- End -----------------------------------
+Enumerate time (seconds): 0.123252
+#Embeddings: 1933960
+Call Count: 4837176
+-------------------------------- End -----------------------------------
+
+Amount of Memory Used(MB) : 5.08404
+Preprocessing Time : 0.058405

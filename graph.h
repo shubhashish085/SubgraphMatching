@@ -151,6 +151,10 @@ public:
         return neighbors + offsets[id];
     }
 
+    void getNeighborCount(const VertexID id, ui& count) const {
+        count = offsets[id + 1] - offsets[id];
+    }
+
     ui * getMatchingOrderIndex() const {
         return matching_order_idx;
     }
