@@ -14,16 +14,16 @@
 #define PAD 8
 
 
-ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+size_t** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                                              TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count, ui* candidate_limit){
 
     std::cout << " ################## explore parallel ##################" << std::endl;
 
-    ui** embedding_cnt_array = new ui* [thread_count];
+    size_t** embedding_cnt_array = new size_t * [thread_count];
     double* thread_wise_time = new double [thread_count];
 
     for(ui i = 0; i < thread_count; i++){
-        embedding_cnt_array[i] = new ui[PAD];
+        embedding_cnt_array[i] = new size_t [PAD];
         embedding_cnt_array[i][0] = 0;
     }
 
@@ -92,6 +92,7 @@ ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, con
         ui *idx_count = new ui[max_depth];
         ui *embedding = new ui[max_depth];
         VertexID* intersection_result = new VertexID[max_candidate_count];
+        VertexID* intersection_order = new VertexID[max_depth];
         bool *visited_vertices = new bool[data_graph->getVerticesCount()];
         std::fill(visited_vertices, visited_vertices + data_graph->getVerticesCount(), false);
         VertexID **valid_candidate = new ui *[max_depth];
@@ -129,8 +130,10 @@ ui** ParallelEnumeration::exploreWithEvenDegreeDist(const Graph *data_graph, con
                     idx[cur_depth] = 0;
                     /*Enumerate::generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                                        visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
-                    Enumerate::generateValidCandidatesWithSetIntersection_tp(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                                  visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr, intersection_result);
+                    /*Enumerate::generateValidCandidatesWithSetIntersection_tp(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                  visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr, intersection_result);*/
+                    Enumerate::generateValidCandidatesWithSetIntersectionByOrdering(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                         visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);
                 }
             }
 

@@ -548,7 +548,7 @@ void analyseParallelizationForWeakScaling(Graph* query_graph, Graph* data_graph,
     call_count = 0;
 
     start_time = wtime();
-    ui** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
+    size_t** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
                                                                               candidates_count, matching_order, query_tree, output_limit, call_count, thread_count, candidate_limit);
     for(ui idx = 0; idx < thread_count; idx++){
         embedding_count += embedding_cnt_array[idx][0];
@@ -572,7 +572,7 @@ void analyseParallelizationWithLoadBalance(Graph* query_graph, Graph* data_graph
     size_t call_count = 0;
     ui loop_count = 4;
     int thread_count[] = {2, 4, 8, 16};
-    //int thread_count[] = {2};
+    //int thread_count[] = {16};
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
     ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
@@ -636,7 +636,7 @@ void analyseParallelizationWithLoadBalance(Graph* query_graph, Graph* data_graph
         call_count = 0;
 
         start_time = wtime();
-        ui** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
+        size_t** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
                                    candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i], candidate_limit);
         for(ui idx = 0; idx < thread_count[i]; idx++){
             embedding_count += embedding_cnt_array[idx][0];
@@ -840,8 +840,8 @@ int main(int argc, char** argv) {
     Graph* data_graph = new Graph();
     data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
 
-    //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
-    analyseResult(query_graph, data_graph, output_performance_file);
+    analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
+    //analyseResult(query_graph, data_graph, output_performance_file);
 
 
     /*for(ui i = 0; i < 4; i++) {

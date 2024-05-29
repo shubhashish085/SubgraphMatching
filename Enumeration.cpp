@@ -589,10 +589,10 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                                                         visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
                 /*generateValidCandidatesWithSetIntersection_tp(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                            visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr, intersection_result);*/
-                /*generateValidCandidatesWithSetIntersectionByOrdering(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                              visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);*/
-                generateValidCandidatesWithSetIntersectionAndMaxBound(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                                     visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);
+                generateValidCandidatesWithSetIntersectionByOrdering(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                              visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);
+                /*generateValidCandidatesWithSetIntersectionAndMaxBound(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                     visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);*/
                 /*generateValidCandidatesWithBinarySearch(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                         visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
             }
