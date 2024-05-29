@@ -55,7 +55,11 @@ public:
                                                                      bool* visited_vertices, TreeNode *&tree, ui* order,
                                                               ui* candidate_offset, ui* candidate_csr, VertexID* intersection_array, VertexID* intersection_order);
 
-    static void generateValidCandidatesWithSetIntersectionAndMaxBound(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+    static void generateValidCandidatesWithSetIntersectionAndBoundary(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                      bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
+                                                                      VertexID* intersection_array, VertexID* intersection_order);
+
+    static void generateValidCandidatesWithSetIntersectionAndBinarySearch(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                                                       bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
                                                                       VertexID* intersection_array, VertexID* intersection_order);
 

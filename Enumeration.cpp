@@ -112,14 +112,15 @@ void Enumerate::generateValidCandidatesWithCandidateCSR(const Graph* data_graph,
 /*
  * Generating Valid Candidates During Enumeration according to the previous vertex using Set intersection and two pointer
  * */
-void Enumerate::generateValidCandidatesWithSetIntersectionAndMaxBound(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
-                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
-                                                                     VertexID* intersection_array, VertexID* intersection_order){
+void Enumerate::generateValidCandidatesWithSetIntersectionAndBinarySearch(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                      bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
+                                                                      VertexID* intersection_array, VertexID* intersection_order){
     VertexID u = order[depth];
     VertexID* neighbors;
     ui neighbor_count = 0;
 
-    ui set_ints_length = 0, l_length = 0, max_intersection_boundary = INTMAX_MAX, min_neighbor_count = INTMAX_MAX;
+    ui set_ints_length = 0, l_length = 0, max_intersection_boundary = INTMAX_MAX, min_intersection_boundary = 0, min_neighbor_count = INTMAX_MAX;
+    int start_idx = 0, end_idx = 0;
 
     idx_count[depth] = 0;
 
@@ -139,6 +140,10 @@ void Enumerate::generateValidCandidatesWithSetIntersectionAndMaxBound(const Grap
             max_intersection_boundary = neighbors[neighbor_count - 1];
         }
 
+        if(neighbors[0] > min_intersection_boundary){
+            min_intersection_boundary = neighbors[0];
+        }
+
         if (neighbor_count < min_neighbor_count){
             ui temp = intersection_order[i];
             intersection_order[i] = intersection_order[0];
@@ -147,16 +152,115 @@ void Enumerate::generateValidCandidatesWithSetIntersectionAndMaxBound(const Grap
         }
     }
 
+
+    for (ui i = 0; i < bn_count; i++){
+
+        VertexID* neighbors = data_graph ->getVertexNeighbors(intersection_order[i], neighbor_count);
+
+        if(neighbor_count > 15) {
+            if (i == 0) {
+                Utilities::binary_search_within_limit(neighbors, 0, neighbor_count, min_intersection_boundary,
+                                                      max_intersection_boundary, start_idx, end_idx);
+                std::copy(neighbors + start_idx, neighbors + end_idx, intersection_array);
+                set_ints_length = end_idx - start_idx;
+                l_length = set_ints_length;
+            } else {
+                Utilities::set_intersection_with_boundary_and_binary_search(intersection_array, l_length, neighbors,
+                                                                            neighbor_count, set_ints_length,
+                                                                            min_intersection_boundary,
+                                                                            max_intersection_boundary);
+                l_length = set_ints_length;
+            }
+        }else {
+            if(i == 0){
+                std::copy(neighbors, neighbors + neighbor_count, intersection_array);
+                set_ints_length = neighbor_count;
+                l_length = set_ints_length;
+            }else{
+                Utilities::set_intersection_tp(intersection_array, l_length, neighbors, neighbor_count, set_ints_length);
+                l_length = set_ints_length;
+            }
+        }
+    }
+
+    for(ui i = 0; i < set_ints_length; i++){
+        VertexID v = intersection_array[i];
+        if(!visited_vertices[v]) {
+            for (ui index = candidate_offset[v]; index < candidate_offset[v + 1]; index++) {
+                if (candidate_csr[index] == u) {
+                    valid_candidate[depth][idx_count[depth]++] = v;
+                    break;
+                }
+            }
+        }
+    }
+
+}
+
+/*
+ * Generating Valid Candidates During Enumeration according to the previous vertex using Set intersection and two pointer
+ * */
+void Enumerate::generateValidCandidatesWithSetIntersectionAndBoundary(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
+                                                                     VertexID* intersection_array, VertexID* intersection_order){
+    VertexID u = order[depth];
+    VertexID* neighbors;
+    ui neighbor_count = 0;
+
+    ui set_ints_length = 0, l_length = 0, max_intersection_boundary = INTMAX_MAX, min_intersection_boundary = 0, min_neighbor_count = INTMAX_MAX, start_idx = 0, end_idx = 0;
+
+    idx_count[depth] = 0;
+
+    std::map<ui, ui> intersection_map;
+    std::map<ui, ui>::iterator search_result;
+
+    ui bn_count = tree[u].bn_count_;
+
+    for (ui i = 0; i < bn_count; i++){
+        intersection_order[i] = embedding[tree[u].bn_[i]];
+    }
+
+    for (ui i = 0; i < bn_count; i++){
+        neighbors = data_graph -> getVertexNeighbors(intersection_order[i], neighbor_count);
+
+        if(neighbors[neighbor_count - 1] < max_intersection_boundary){
+            max_intersection_boundary = neighbors[neighbor_count - 1];
+        }
+
+        if(neighbors[0] > min_intersection_boundary){
+            min_intersection_boundary = neighbors[0];
+        }
+
+        if (neighbor_count < min_neighbor_count){
+            ui temp = intersection_order[i];
+            intersection_order[i] = intersection_order[0];
+            intersection_order[0] = temp;
+            min_neighbor_count = neighbor_count;
+        }
+    }
+
+
     for (ui i = 0; i < bn_count; i++){
 
         VertexID* neighbors = data_graph ->getVertexNeighbors(intersection_order[i], neighbor_count);
 
         if(i == 0){
-            std::copy(neighbors, neighbors + neighbor_count, intersection_array);
-            set_ints_length = neighbor_count;
+            start_idx = 0;
+            end_idx = neighbor_count;
+
+            while(start_idx < end_idx && neighbors[start_idx] < min_intersection_boundary){
+                start_idx++;
+            }
+
+            while (start_idx < end_idx && neighbors[end_idx - 1] > max_intersection_boundary){
+                end_idx--;
+            }
+
+            std::copy(neighbors + start_idx , neighbors + end_idx, intersection_array);
+            set_ints_length = end_idx - start_idx;
             l_length = set_ints_length;
         }else{
-            Utilities::set_intersection_with_maximum_bound(intersection_array, l_length, neighbors, neighbor_count, set_ints_length, max_intersection_boundary);
+            Utilities::set_intersection_with_boundary(intersection_array, l_length, neighbors, neighbor_count, set_ints_length, min_intersection_boundary, max_intersection_boundary);
             l_length = set_ints_length;
         }
     }
@@ -589,10 +693,13 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                                                         visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
                 /*generateValidCandidatesWithSetIntersection_tp(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                            visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr, intersection_result);*/
-                generateValidCandidatesWithSetIntersectionByOrdering(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                              visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);
-                /*generateValidCandidatesWithSetIntersectionAndMaxBound(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                /*generateValidCandidatesWithSetIntersectionByOrdering(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                              visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);*/
+                /*generateValidCandidatesWithSetIntersectionAndBoundary(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                                      visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);*/
+                generateValidCandidatesWithSetIntersectionAndBinarySearch(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                      visited_vertices,tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order);
+
                 /*generateValidCandidatesWithBinarySearch(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                         visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);*/
             }
