@@ -515,7 +515,7 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
 
 #pragma omp parallel
     {
-        double start_time = wtime();
+        double start_time = wtime(), end_time;
 
         int th_id = omp_get_thread_num();
         int cur_depth = 0;
@@ -575,6 +575,7 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
                     visited_vertices[embedding[order[cur_depth]]] = false;
             }
 
+            end_time = wtime();
         }
 
 
@@ -589,7 +590,6 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
         }
         delete[] valid_candidate;
 
-        double end_time = wtime();
         thread_wise_time[th_id] = end_time - start_time;
 
     }
