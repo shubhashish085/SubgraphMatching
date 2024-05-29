@@ -341,6 +341,8 @@ void Enumerate::generateValidCandidatesWithSetIntersectionByOrdering(const Graph
 
 }
 
+
+
 /*
  * Generating Valid Candidates During Enumeration according to the previous vertex using Set intersection and two pointer
  * */

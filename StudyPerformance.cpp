@@ -570,7 +570,7 @@ void analyseParallelizationWithLoadBalance(Graph* query_graph, Graph* data_graph
     ui** candidates = NULL;
     ui* candidates_count = NULL;
     size_t call_count = 0;
-    ui loop_count = 4;
+    ui loop_count = 1;
     int thread_count[] = {2, 4, 8, 16};
     //int thread_count[] = {16};
     size_t output_limit = std::numeric_limits<size_t>::max();
@@ -636,9 +636,12 @@ void analyseParallelizationWithLoadBalance(Graph* query_graph, Graph* data_graph
         call_count = 0;
 
         start_time = wtime();
-        size_t** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
-                                   candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i], candidate_limit);
+        /*size_t** embedding_cnt_array = ParallelEnumeration::exploreWithEvenDegreeDist(data_graph, query_graph, candidates,
+                                   candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i], candidate_limit);*/
+        size_t** embedding_cnt_array = ParallelEnumeration::exploreWithDynamicLoadBalance(data_graph, query_graph, candidates,
+                                                                                      candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i]);
         for(ui idx = 0; idx < thread_count[i]; idx++){
+            std::cout << " Thread id " << idx << " : Count : " << embedding_cnt_array[idx][0] << std::endl;
             embedding_count += embedding_cnt_array[idx][0];
         }
 
