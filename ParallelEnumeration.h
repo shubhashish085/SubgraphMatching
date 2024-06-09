@@ -20,6 +20,8 @@ public:
                                                  TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count);
     static size_t** exploreWithDynamicLoadBalance(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                                    TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count);
+    static size_t** exploreWithDynamicLoadBalanceForAnalysis(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+                                                  TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count, ui* thread_map, size_t* result);
     static size_t** exploreWithEvenDegreeDist(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                                                         TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count, ui* candidate_limit);
 

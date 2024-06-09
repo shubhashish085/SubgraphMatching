@@ -14,6 +14,8 @@ public:
     static void generateCFLFilterPlan(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                       VertexID *&order, int &level_count, ui *&level_offset);
 
+    static ui* generateLoadBalacePlan(const Graph *data_graph, const Graph *query_graph, VertexID *&order, ui** candidates, ui* candidate_count, ui* candidate_offset, ui* candidate_csr);
+
     static void generateCFLFilterPlanForDirectedGraph(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                       VertexID *&order, int &level_count, ui *&level_offset);
 

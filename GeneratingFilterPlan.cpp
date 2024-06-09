@@ -123,6 +123,39 @@ void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const 
     level_offset[0] = 0;
 }
 
+ui* GeneratingFilterPlan::generateLoadBalacePlan(const Graph *data_graph, const Graph *query_graph, VertexID *&order, ui** candidates, ui* candidate_count, ui* candidate_offset, ui* candidate_csr) {
+
+    ui* predicted_cardinality = new ui[data_graph -> getVerticesCount()];
+
+
+    VertexID start_vertex = order[0];
+    VertexID second_vertex = order[1];
+    ui neighbor_count = 0, count = 0;
+
+    for (ui j = 0; j < candidate_count[start_vertex]; j++){
+
+        count = 0;
+        VertexID* neighbors = data_graph->getVertexNeighbors(candidates[start_vertex][j], neighbor_count);
+        for(ui k = 0; k < neighbor_count; k++){
+            VertexID neighbor = neighbors[k];
+
+            for (ui i = candidate_offset[neighbor]; i < candidate_offset[neighbor + 1]; i++){
+                if(candidate_csr[i] == second_vertex) {
+                    count++;
+                    break;
+                }
+            }
+        }
+
+        predicted_cardinality[candidates[start_vertex][j]] = count;
+
+    }
+
+    return predicted_cardinality;
+
+}
+
+
 void GeneratingFilterPlan::generateCFLFilterPlanForDirectedGraph(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                                  VertexID *&order, int &level_count, ui *&level_offset) {
 
