@@ -752,7 +752,7 @@ void analyseParallelizationWithDynamicLoadBalanceForAnalysis(Graph* query_graph,
 
 
     std::cout << "Exploration Started" << std::endl;
-    for (ui i = 0; i < loop_count; i++){
+    for (ui i = 3; i < loop_count; i++){
 
         embedding_count = 0;
         call_count = 0;
