@@ -6,6 +6,7 @@
 #include "GeneratingFilterPlan.h"
 #include "backtracking.h"
 #include <queue>
+#include <algorithm>
 
 
 
@@ -127,6 +128,7 @@ ui* GeneratingFilterPlan::generateLoadBalacePlan(const Graph *data_graph, const 
 
     ui* predicted_cardinality = new ui[data_graph -> getVerticesCount()];
 
+    memset(predicted_cardinality, 0, sizeof(ui) * (data_graph -> getVerticesCount()));
 
     VertexID start_vertex = order[0];
     VertexID second_vertex = order[1];

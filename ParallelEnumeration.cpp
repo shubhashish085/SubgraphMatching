@@ -4,6 +4,7 @@
 
 #include "ParallelEnumeration.h"
 #include "Enumeration.h"
+#include "GeneratingFilterPlan.h"
 #include "wtime.h"
 #include <omp.h>
 #include <algorithm>
@@ -663,6 +664,16 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalanceForAnalysis(const Gra
     int max_depth = query_graph->getVerticesCount();
     ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
     VertexID start_vertex = order[0];
+
+    ui* predicted_cardinality = GeneratingFilterPlan::generateLoadBalacePlan(data_graph, query_graph, order, candidates, candidates_count, candidate_offset, candidate_csr);
+
+    ui avg_predicted_cardinality = 0;
+    for (ui i = 0; i < candidates_count[start_vertex]; i++){
+        avg_predicted_cardinality += predicted_cardinality[candidates[start_vertex][i]];
+    }
+
+    avg_predicted_cardinality /= candidates_count[start_vertex];
+
 
     omp_set_num_threads(thread_count);
 
