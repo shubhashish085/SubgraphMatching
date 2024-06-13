@@ -654,31 +654,16 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
         input_file >> end;
 
         line_count++;
-        if(begin >= vertices_count || end >= vertices_count || begin == end){
-            //std::cout << "Input line : " << input_line << std::endl;
-            //std::cout << "Line count : " << line_count << " start index : " << begin << " end index : " << end << std::endl;
-            continue;
+
+        ui offset = offsets[begin - 1] + neighbors_offset[begin - 1]; // adjusting the index of neighbor in neighbors array
+        neighbors[offset] = end - 1;
+
+        neighbors_offset[begin - 1] += 1;
+
+        if(neighborhood_label_count[begin - 1].find(labels[end - 1]) == neighborhood_label_count[end - 1].end()){
+            neighborhood_label_count[begin - 1][labels[end - 1]] = 0;
         }
-
-        ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
-        neighbors[offset] = end;
-
-        offset = offsets[end] + neighbors_offset[end]; // adjusting the index of neighbor in neighbors array
-        neighbors[offset] = begin;
-
-        neighbors_offset[begin] += 1;
-        neighbors_offset[end] += 1;
-
-        if(neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()){
-            neighborhood_label_count[begin][labels[end]] = 0;
-        }
-        neighborhood_label_count[begin][labels[end]] += 1;
-
-        if(neighborhood_label_count[end].find(labels[begin]) == neighborhood_label_count[begin].end()){
-            neighborhood_label_count[end][labels[begin]] = 0;
-        }
-        neighborhood_label_count[end][labels[begin]] += 1;
-
+        neighborhood_label_count[begin - 1][labels[end - 1]] += 1;
     }
 
     std::cout << "Line count " << line_count << std::endl;
@@ -699,7 +684,6 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     BuildReverseIndex();
 
-    //printGraphData();
 }
 
 
