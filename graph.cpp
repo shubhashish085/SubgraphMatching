@@ -25,6 +25,8 @@ void Graph::BuildReverseIndex() {
     }
 }
 
+
+
 void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
 
     std::cout << "############# Loading Graph With Edges ###############" << std::endl;
@@ -550,9 +552,7 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
     //printGraphData();
 }
 
-void Graph::loadGraphFromFileForWeakScaling(const std::string& file_path, ui division_factor){
-
-    ui highest_threads = 16;
+void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     std::cout << "############# Loading Graph With Edges ###############" << std::endl;
 
@@ -563,7 +563,6 @@ void Graph::loadGraphFromFileForWeakScaling(const std::string& file_path, ui div
         exit(-1);
     }
 
-    char type;
     std::string input_line;
     ui label = 0;
 
@@ -571,60 +570,39 @@ void Graph::loadGraphFromFileForWeakScaling(const std::string& file_path, ui div
 
     ui line_count = 0, count = 0, comment_line_count = 4;
 
-    while (std::getline(infile, input_line)) {
-
-        //std::cout << " Input Line : " << input_line << std::endl;
-
-        if (input_line.rfind("#", 0) == 0) {
-
-            line_count++;
-
-            if (input_line.rfind("# Nodes", 0) == 0) {
-                std::stringstream ss(input_line);
-                std::string token;
-                int count = 0;
-                while (!ss.eof()) {
-                    std::getline(ss, token, ' ');
-                    if (!(token.rfind("#", 0) == 0 || token.rfind("Nodes:", 0) == 0 || token.rfind("Edges:", 0) == 0)) {
-                        if (count == 0) {
-                            vertices_count = stoi(token);
-                            vertices_count = ((vertices_count * division_factor) / highest_threads);
-                            std::cout << "Vertex Count : " << vertices_count << std::endl;
-                            degrees = new ui[vertices_count];
-                            std::fill(degrees, degrees + vertices_count, 0);
-                            /*for (int i = 0; i < vertices_count; i++) {
-                                degrees[i] = 0;
-                            }*/
-                            count = 1;
-                        } else {
-                            edges_count = stoi(token);
-                            count = 0;
-                        }
-                        std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
-                                  << std::endl;
-                    }
-                }
-            }
-        }
-
-        if(line_count >= comment_line_count){
-            break;
-        }
-    }
+    vertices_count = 0;
+    edges_count = 0;
 
     VertexID begin, end;
 
-    edges_count = 0;
+    while (infile >> begin){
+
+        infile >> end;
+
+        if(vertices_count < begin){
+            vertices_count = begin;
+        }
+
+        if(vertices_count < end){
+            vertices_count = end;
+        }
+
+        edges_count++;
+    }
+
+    edges_count /= 2;
+    degrees = new ui[vertices_count];
+
 
     while(infile >> begin) {
 
         infile >> end;
+        degrees[begin - 1] += 1;
+        degrees[end - 1] += 1;
+    }
 
-        if (begin != end && begin < vertices_count && end < vertices_count) {
-            edges_count++;
-            degrees[begin] += 1;
-            degrees[end] += 1;
-        }
+    for (ui i = 0; i < vertices_count; i++){
+        degrees[i] /= 2;
     }
 
     infile.close();
@@ -723,7 +701,6 @@ void Graph::loadGraphFromFileForWeakScaling(const std::string& file_path, ui div
 
     //printGraphData();
 }
-
 
 
 void Graph::loadGraphFromFile(const std::string &file_path) {

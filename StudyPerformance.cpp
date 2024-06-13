@@ -578,38 +578,6 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
     std::cout << "Serial Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
     std::cout << "Time " << end_time - start_time << std::endl;
 
-    //Recursive Strategy
-    //exploreByRecursion(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count);
-    //std::cout << "Recursive Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
-
-    //Parallel OpenMP
-    /*double start_time = wtime();
-    ui* embedding_cnt_array = ParallelEnumeration::explore(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count);
-    double end_time = wtime();
-    for(ui i = 0; i < thread_count; i++){
-        embedding_count += embedding_cnt_array[i];
-    }
-
-    std::cout << "Parallel Strategy Embedding Count : " << embedding_count << std::endl;
-    std::cout << "Time" << end_time - start_time << std::endl;*/
-
-
-
-    //Recursive Strategy Without Candidate
-    /*ui * embedding = new ui[query_graph -> getVerticesCount()];
-    bool* visited_vertices = new bool[data_graph -> getVerticesCount()];
-
-    for(ui i = 0; i < data_graph->getVerticesCount(); i++){
-        visited_vertices[i] = false;
-    }
-
-    start_time = wtime();
-    Enumerate::exploreWithoutCandidate(data_graph, query_graph, matching_order, embedding, 0, visited_vertices, query_tree, embedding_count, call_count);
-    end_time = wtime();
-    std::cout << "Recursive Strategy Without Candidate Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
-    std::cout << "Time" << end_time - start_time << std::endl;*/
-
-
 }
 
 
