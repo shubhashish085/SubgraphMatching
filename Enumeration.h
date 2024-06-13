@@ -54,6 +54,9 @@ public:
     static void generateValidCandidatesWithSetIntersectionByOrdering(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                                                      bool* visited_vertices, TreeNode *&tree, ui* order,
                                                               ui* candidate_offset, ui* candidate_csr, VertexID* intersection_array, VertexID* intersection_order);
+    static void generateValidCandidatesForTriangle(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                     bool* visited_vertices, TreeNode *&tree, ui* order,
+                                                                     ui* candidate_offset, ui* candidate_csr, VertexID* intersection_array, VertexID* intersection_order);
 
     static void generateValidCandidatesWithSetIntersectionAndBoundary(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                                                       bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,

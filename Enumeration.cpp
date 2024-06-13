@@ -342,6 +342,70 @@ void Enumerate::generateValidCandidatesWithSetIntersectionByOrdering(const Graph
 }
 
 
+void Enumerate::generateValidCandidatesForTriangle(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
+                                                                     VertexID* intersection_array, VertexID* intersection_order){
+
+    VertexID u = order[depth], next_vertex_limit = 0;
+    ui neighbor_count = 0, embedding_vertex;
+
+    ui set_ints_length = 0, l_length = 0, min_neighbor_count = INTMAX_MAX;
+
+    idx_count[depth] = 0;
+
+    std::map<ui, ui> intersection_map;
+    std::map<ui, ui>::iterator search_result;
+
+    ui bn_count = tree[u].bn_count_;
+
+    for (ui i = 0; i < bn_count; i++){
+        embedding_vertex = embedding[tree[u].bn_[i]];
+        intersection_order[i] = embedding_vertex;
+        if(next_vertex_limit < embedding_vertex){
+            next_vertex_limit = embedding_vertex;
+        }
+    }
+
+    for (ui i = 0; i < bn_count; i++){
+        data_graph ->getNeighborCount(intersection_order[i], neighbor_count);
+        if (neighbor_count < min_neighbor_count){
+            ui temp = intersection_order[i];
+            intersection_order[i] = intersection_order[0];
+            intersection_order[0] = temp;
+            min_neighbor_count = neighbor_count;
+        }
+    }
+
+    for (ui i = 0; i < bn_count; i++){
+
+        VertexID* neighbors = data_graph ->getVertexNeighbors(intersection_order[i], neighbor_count);
+
+        if(i == 0){
+            std::copy(neighbors, neighbors + neighbor_count, intersection_array);
+            set_ints_length = neighbor_count;
+            l_length = set_ints_length;
+        }else{
+            Utilities::set_intersection_tp(intersection_array, l_length, neighbors, neighbor_count, set_ints_length);
+            l_length = set_ints_length;
+        }
+    }
+
+    for(ui i = 0; i < set_ints_length; i++){
+        VertexID v = intersection_array[i];
+        if(!visited_vertices[v] && v > next_vertex_limit) {
+            for (ui index = candidate_offset[v]; index < candidate_offset[v + 1]; index++) {
+                if (candidate_csr[index] == u) {
+                    valid_candidate[depth][idx_count[depth]++] = v;
+                    break;
+                }
+            }
+        }
+    }
+
+}
+
+
+
 
 /*
  * Generating Valid Candidates During Enumeration according to the previous vertex using Set intersection and two pointer
