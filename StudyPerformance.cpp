@@ -522,8 +522,8 @@ void analyseParallelizationWithDynamicLoadBalance(Graph* query_graph, Graph* dat
         }
 
         end_time = wtime();
-        ParallelEnumeration::writeResult(output_file_path, thread_count[i], call_count, embedding_count);
 
+        ParallelEnumeration::writeResult(output_file_path, thread_count[i], call_count, embedding_count, end_time - start_time);
         std::cout << "Time " << end_time - start_time << std::endl;
     }
 
@@ -607,7 +607,9 @@ int main(int argc, char** argv) {
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    data_graph->loadGraphFromFileFromTsv(input_data_graph_file);
+    //data_graph->checkGraphDirectedOrUndirected(input_data_graph_file);
 
     analyseParallelizationWithDynamicLoadBalance(query_graph, data_graph, output_performance_file);
 

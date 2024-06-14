@@ -552,6 +552,71 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
     //printGraphData();
 }
 
+void Graph::checkGraphDirectedOrUndirected(const std::string& file_path) {
+
+    std::ifstream infile(file_path);
+
+    if (!infile.is_open()) {
+        std::cout << "Can not open the graph file " << file_path << " ." << std::endl;
+        exit(-1);
+    }
+
+    VertexID begin, end;
+    ui weight;
+
+    vertices_count = 0;
+    edges_count = 0;
+
+    while (infile >> begin){
+
+        infile >> end >> weight;
+
+        if(vertices_count < begin){
+            vertices_count = begin;
+        }
+
+        if(vertices_count < end){
+            vertices_count = end;
+        }
+
+        edges_count++;
+    }
+
+    infile.close();
+    infile.open(file_path);
+
+    VertexID* begin_pts = new VertexID [edges_count];
+    VertexID* end_pts = new VertexID [edges_count];
+
+    ui idx = 0, count = 0;
+    while (infile >> begin){
+
+        infile >> end >> weight;
+        begin_pts[idx] = begin - 1;
+        end_pts[idx] = end - 1;
+
+        idx++;
+    }
+
+    for (ui i = 0; i < edges_count; i++){
+        count = 0;
+        for(ui j = 0; j < edges_count; j++){
+            if(i == j){
+                continue;
+            }
+
+            if((begin_pts[i] == begin_pts[j] && end_pts[i] == end_pts[j]) || (begin_pts[i] == end_pts[j] && end_pts[i] == begin_pts[j])){
+                count++;
+            }
+        }
+
+        if(count != 2 && count != 1){
+            std::cout << " Begin : " << begin_pts[i] << " End : " << end_pts[i] <<  " Count : " <<  count <<std::endl;
+        }
+    }
+
+}
+
 void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     std::cout << "############# Loading Graph With Edges ###############" << std::endl;
@@ -568,16 +633,17 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     std::cout << "Reading File............ " << std::endl;
 
-    ui line_count = 0, count = 0, comment_line_count = 4;
+    ui line_count = 0, count = 0, comment_line_count = 4, offset;
 
     vertices_count = 0;
     edges_count = 0;
 
     VertexID begin, end;
+    ui weight;
 
     while (infile >> begin){
 
-        infile >> end;
+        infile >> end >> weight;
 
         if(vertices_count < begin){
             vertices_count = begin;
@@ -590,26 +656,44 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
         edges_count++;
     }
 
-    edges_count /= 2;
     degrees = new ui[vertices_count];
+    std::fill(degrees, degrees + vertices_count, 0);
 
+    infile.close();
+    infile.open(file_path);
+
+    VertexID* begin_vtx = new VertexID [edges_count];
+    VertexID* end_vtx = new VertexID [edges_count];
+
+    ui idx = 0;
+    edges_count = 0;
+    bool is_inserted = false;
 
     while(infile >> begin) {
+        infile >> end >> weight;
+        is_inserted = false;
 
-        infile >> end;
-        degrees[begin - 1] += 1;
-        degrees[end - 1] += 1;
-    }
+        for(ui i = 0; i < idx; i++){
+            if ((begin_vtx[i] == begin - 1 && end_vtx[i] == end - 1) || (begin_vtx[i] == end - 1 && end_vtx[i] == begin - 1)){
+                is_inserted = true;
+            }
+        }
 
-    for (ui i = 0; i < vertices_count; i++){
-        degrees[i] /= 2;
+        if(!is_inserted) {
+            begin_vtx[idx] = begin - 1;
+            end_vtx[idx] = end - 1;
+            degrees[begin - 1] += 1;
+            degrees[end - 1] += 1;
+            idx++;
+            edges_count++;
+        }
+
     }
 
     infile.close();
+    infile.open(file_path);
 
-    std::ifstream input_file(file_path);
-
-    offsets = new ui[vertices_count +  1];
+    offsets = new ui[vertices_count + 1];
     offsets[0] = 0;
 
     neighbors = new VertexID[edges_count * 2];
@@ -618,9 +702,9 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
     labels_count = 0;
     max_degree = 0;
 
-    std::cout << "Initialization Finished" << std::endl;
+    std::cout << "Edge Count : " << edges_count << " Vertices Count : " << vertices_count << std::endl;
 
-    LabelID max_label_id = 0, begin_vtx_label, end_vtx_label;
+    LabelID max_label_id = 0;
     std::vector<ui> neighbors_offset(vertices_count, 0);// used for adjust neighbors with offset
 
     for(ui id = 0; id < vertices_count; id++){
@@ -640,35 +724,34 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
         labels_frequency[label] += 1;
     }
 
-    line_count = 0;
 
-    while (std::getline(input_file, input_line)) {
-        line_count++;
-        if(line_count >= comment_line_count){
-            break;
+    for (ui i = 0; i < idx; i++){ // Read edge.
+
+        begin = begin_vtx[i];
+        end = end_vtx[i];
+
+        offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
+        neighbors[offset] = end;
+
+        offset = offsets[end] + neighbors_offset[end]; // adjusting the index of neighbor in neighbors array
+        neighbors[offset] = begin;
+
+        neighbors_offset[begin] += 1;
+        neighbors_offset[end] += 1;
+
+        if(neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()){
+            neighborhood_label_count[begin][labels[end]] = 0;
         }
+        neighborhood_label_count[begin][labels[end]] += 1;
+
+        if(neighborhood_label_count[end].find(labels[begin]) == neighborhood_label_count[begin].end()){
+            neighborhood_label_count[end][labels[begin]] = 0;
+        }
+        neighborhood_label_count[end][labels[begin]] += 1;
     }
 
-    while(input_file >> begin){ // Read edge.
 
-        input_file >> end;
-
-        line_count++;
-
-        ui offset = offsets[begin - 1] + neighbors_offset[begin - 1]; // adjusting the index of neighbor in neighbors array
-        neighbors[offset] = end - 1;
-
-        neighbors_offset[begin - 1] += 1;
-
-        if(neighborhood_label_count[begin - 1].find(labels[end - 1]) == neighborhood_label_count[end - 1].end()){
-            neighborhood_label_count[begin - 1][labels[end - 1]] = 0;
-        }
-        neighborhood_label_count[begin - 1][labels[end - 1]] += 1;
-    }
-
-    std::cout << "Line count " << line_count << std::endl;
-
-    input_file.close();
+    infile.close();
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
     for (auto element : labels_frequency) {

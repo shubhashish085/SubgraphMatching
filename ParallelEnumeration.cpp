@@ -15,6 +15,26 @@
 #define PAD 8
 
 
+void ParallelEnumeration::writeResult(const std::string& file_path, int& thread_count, size_t &call_count, size_t &embedding_count, double time){
+    std::ofstream outputfile;
+    outputfile.open(file_path, std::ios::app);
+
+
+    outputfile << "----------------------------------------" << std::endl;
+    outputfile << std::endl;
+
+    outputfile << "Thread Count : " << thread_count << std::endl;
+    outputfile << "Embedding Count : " << embedding_count << std::endl;
+    outputfile << "Operation Count : " << call_count << std::endl;
+    outputfile << "Enumeration Time : " << time << std::endl;
+    outputfile << std::endl;
+
+    outputfile << "----------------------------------------" << std::endl;
+
+    outputfile.flush();
+    outputfile.close();
+}
+
 
 void ParallelEnumeration::writeResult(const std::string& file_path, int& thread_count, size_t &call_count, size_t &embedding_count){
     std::ofstream outputfile;
@@ -96,10 +116,11 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
 
     ui par_loop_idx = 0;
 
+    double start_time = wtime();
 
 #pragma omp parallel
     {
-        double start_time = wtime(), end_time;
+        double  end_time;
 
         int th_id = omp_get_thread_num();
         int cur_depth = 0;
@@ -159,9 +180,7 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
                     visited_vertices[embedding[order[cur_depth]]] = false;
             }
 
-            end_time = wtime();
         }
-
 
         // Release the buffer.
         EXIT:
@@ -174,6 +193,7 @@ size_t** ParallelEnumeration::exploreWithDynamicLoadBalance(const Graph *data_gr
         }
         delete[] valid_candidate;
 
+        end_time = wtime();
         thread_wise_time[th_id] = end_time - start_time;
 
     }
