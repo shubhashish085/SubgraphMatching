@@ -767,6 +767,9 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     BuildReverseIndex();
 
+    delete[] begin_vtx;
+    delete[] end_vtx;
+
 }
 
 
