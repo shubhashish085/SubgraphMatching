@@ -1,0 +1,32 @@
+----------------------------------------
+
+Thread Count : 2
+Embedding Count : 7
+Operation Count : 1699137
+Enumeration Time : 4.43538
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 4
+Embedding Count : 7
+Operation Count : 1683132
+Enumeration Time : 4.04382
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 8
+Embedding Count : 7
+Operation Count : 1648006
+Enumeration Time : 4.01522
+
+----------------------------------------
+----------------------------------------
+
+Thread Count : 16
+Embedding Count : 7
+Operation Count : 1512961
+Enumeration Time : 4.0499
+
+----------------------------------------
