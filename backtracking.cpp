@@ -79,6 +79,91 @@ AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, TreeNode 
 }
 
 
+void
+AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, ui* level) {
+
+    ui vertex_num = graph->getVerticesCount();
+    VertexID u, u_nbr;
+
+    std::queue<VertexID> bfs_queue;
+    std::vector<bool> visited(vertex_num, false);
+
+    ui visited_vertex_count = 0, u_nbr_level, u_level;
+    bfs_queue.push(root_vertex);
+    visited[root_vertex] = true;
+    level[root_vertex] = 0;
+
+    while(!bfs_queue.empty()) {
+        u = bfs_queue.front();
+        u_level = level[u];
+        bfs_queue.pop();
+
+        u_nbr_level = u_level + 1;
+        ui u_nbrs_count;
+        const VertexID* u_nbrs = graph->getVertexNeighbors(u, u_nbrs_count);
+        for (ui i = 0; i < u_nbrs_count; ++i) {
+            u_nbr = u_nbrs[i];
+
+            if (!visited[u_nbr]) {
+                bfs_queue.push(u_nbr);
+                visited[u_nbr] = true;
+                level[u_nbr] = u_nbr_level;
+            }
+        }
+    }
+
+}
+
+
+void
+AlgorithmStore::bfsTraversalWithDistance(const Graph *graph, VertexID root_vertex, ui* distance_array, ui* path_count, ui distance) {
+
+    ui vertex_num = graph->getVerticesCount();
+
+    std::queue<VertexID> bfs_queue;
+    std::vector<bool> visited(vertex_num, false);
+
+    for (ui i = 0; i < vertex_num; ++i) {
+        path_count[i] = 0;
+    }
+
+    bfs_queue.push(root_vertex);
+    visited[root_vertex] = true;
+    ui u_dist, u_nbr_dist;
+    VertexID u, u_nbr;
+
+    while(!bfs_queue.empty()) {
+        u = bfs_queue.front();
+        u_dist = distance_array[u];
+        if(u_dist == distance){
+            break;
+        }
+
+        bfs_queue.pop();
+        bfs_order[visited_vertex_count++] = u;
+
+        ui u_nbrs_count;
+        u_nbr_dist = u_dist + 1;
+        const VertexID* u_nbrs = graph->getVertexNeighbors(u, u_nbrs_count);
+        for (ui i = 0; i < u_nbrs_count; ++i) {
+            u_nbr = u_nbrs[i];
+
+            if (u_nbr != root_vertex) {
+                if(!visited[u_nbr]) {
+                    bfs_queue.push(u_nbr);
+                    visited[u_nbr] = true;
+                    distance_array[u_nbr] = u_nbr_dist;
+                }
+                if (u_nbr_dist == distance){
+                    path_count[u_nbr] += 1;
+                }
+            }
+        }
+    }
+
+}
+
+
 bool
 AlgorithmStore :: BFSTraversal(const Graph *graph, VertexID start_node, std::vector<std::pair<VertexID , VertexID>>& non_tree_edges, std::vector<ui>& matching_order,
                                std::vector<bool>& visited, int* parent_vtr){
