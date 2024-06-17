@@ -10,6 +10,7 @@
 #include "GeneratingFilterPlan.h"
 #include "Enumeration.h"
 #include "ParallelEnumeration.h"
+#include "TriangleEnumeration.h"
 #include "wtime.h"
 #include <chrono>
 #include <limits>
@@ -582,7 +583,7 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
 
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     MatchingCommand command(argc, argv);
     std::string input_query_graph_file = command.getQueryGraphFilePath();
@@ -612,5 +613,31 @@ int main(int argc, char** argv) {
     //data_graph->checkGraphDirectedOrUndirected(input_data_graph_file);
 
     analyseParallelizationWithDynamicLoadBalance(query_graph, data_graph, output_performance_file);
+
+}*/
+
+
+//For Triangle Counting
+int main(int argc, char** argv) {
+
+    //MatchingCommand command(argc, argv);
+    //std::string input_query_graph_file = command.getQueryGraphFilePath();
+    //std::string input_data_graph_file = command.getDataGraphFilePath();
+    //std::string output_performance_file = command.getOutputFilePath();
+
+    size_t call_count = 0;
+    size_t output_limit = std::numeric_limits<size_t>::max();
+
+
+    //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    std::string input_data_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    std::string edge_file = "../tests/basic_edges.graph";
+
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFile(input_data_graph_file);
+    std::vector<std::pair<VertexID, VertexID>> edge_vtr = data_graph->getUniqueEdges(edge_file);
+    ui* result_array = new ui[data_graph->getVerticesCount()];
+
+    TriangleEnumerate::enumerateTriangles(data_graph, edge_vtr, result_array, output_limit, call_count);
 
 }

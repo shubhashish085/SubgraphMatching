@@ -52,6 +52,16 @@ public:
 
     }
 
+    Graph(ui vtx_cnt, ui edges_cnt, ui* offset_array, ui* neighbor_array) {
+
+        vertices_count = vtx_cnt;
+        edges_count = edges_cnt;
+        labels_count = 0;
+        labels = NULL;
+        offsets = offset_array;
+        neighbors = neighbor_array;
+    }
+
     ~Graph() {
         delete[] offsets;
         delete[] neighbors;
@@ -73,6 +83,7 @@ public:
     void loadDirectedGraphFromFile(const std::string& file_path);
     void printGraphMetaData();
     void setMatchingOrderIndex(std::vector<ui> matching_order);
+    std::vector<std::pair<VertexID, VertexID>> getUniqueEdges(const std::string& file_path);
 
 public:
 
