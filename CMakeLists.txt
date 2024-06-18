@@ -32,6 +32,8 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         types.h
         util.h
         wtime.h
+        TriangleEnumeration.h
+        TriangleEnumeration.cpp
         StudyPerformance.cpp)
 
 

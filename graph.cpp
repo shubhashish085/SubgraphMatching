@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
+#include <utility>
 #include <algorithm>
 #include <sstream>
 
@@ -617,6 +618,32 @@ void Graph::checkGraphDirectedOrUndirected(const std::string& file_path) {
 
 }
 
+
+std::vector<std::pair<VertexID, VertexID>> Graph::getUniqueEdges(const std::string& file_path){
+
+    std::ifstream infile(file_path);
+    std::vector<std::pair<VertexID, VertexID>> edge_vtr;
+
+    if (!infile.is_open()) {
+        std::cout << "Can not open the graph file " << file_path << " ." << std::endl;
+        exit(-1);
+    }
+
+    VertexID begin, end;
+    ui weight;
+
+    while(infile >> begin) {
+        infile >> end >> weight;
+        //std::cout << "Edge : " << begin << " -> " << end << std::endl;
+        edge_vtr.push_back(std::make_pair(begin - 1, end - 1));
+    }
+    infile.close();
+
+    return edge_vtr;
+}
+
+
+
 void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
 
     std::cout << "############# Loading Graph With Edges ###############" << std::endl;
@@ -628,12 +655,12 @@ void Graph::loadGraphFromFileFromTsv(const std::string& file_path){
         exit(-1);
     }
 
-    std::string input_line;
+
     ui label = 0;
 
     std::cout << "Reading File............ " << std::endl;
 
-    ui line_count = 0, count = 0, comment_line_count = 4, offset;
+    ui offset;
 
     vertices_count = 0;
     edges_count = 0;

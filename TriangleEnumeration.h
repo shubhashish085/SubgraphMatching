@@ -8,10 +8,11 @@
 #include "graph.h"
 #include "types.h"
 
-class TriangleEnumeration {
+class TriangleEnumerate {
 
 public:
-    static size_t enumerateTriangles(const Graph *data_graph, size_t output_limit_num, size_t &call_count);
+    static size_t enumerateTriangles(const Graph* data_graph, std::vector<std::pair<VertexID, VertexID>>& edges, ui* result_array,
+                                     size_t &output_limit_num, size_t &call_count);
     static void buildGraph();
 
 

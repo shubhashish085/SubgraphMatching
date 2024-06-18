@@ -80,7 +80,7 @@ AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, TreeNode 
 
 
 void
-AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, ui* level) {
+AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, int* level) {
 
     ui vertex_num = graph->getVerticesCount();
     VertexID u, u_nbr;
@@ -116,21 +116,25 @@ AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, ui* level
 
 
 void
-AlgorithmStore::bfsTraversalWithDistance(const Graph *graph, VertexID root_vertex, ui* distance_array, ui* path_count, ui distance) {
+AlgorithmStore::bfsTraversalWithDistance(const Graph *graph, VertexID root_vertex, ui* distance_array, ui* explored_vertices, bool* visited, ui* path_count, ui distance) {
 
-    ui vertex_num = graph->getVerticesCount();
+    ui vertex_num = graph->getVerticesCount(), explored_vertices_count = 0;
 
     std::queue<VertexID> bfs_queue;
-    std::vector<bool> visited(vertex_num, false);
+
 
     for (ui i = 0; i < vertex_num; ++i) {
         path_count[i] = 0;
+        visited[i] = false;
     }
+
+    //std::cout << "BFS started from start vertex : " << root_vertex << std::endl;
 
     bfs_queue.push(root_vertex);
     visited[root_vertex] = true;
-    ui u_dist, u_nbr_dist;
+    ui u_dist, u_nbr_dist, u_nbrs_count;
     VertexID u, u_nbr;
+    VertexID* u_nbrs;
 
     while(!bfs_queue.empty()) {
         u = bfs_queue.front();
@@ -140,11 +144,10 @@ AlgorithmStore::bfsTraversalWithDistance(const Graph *graph, VertexID root_verte
         }
 
         bfs_queue.pop();
-        bfs_order[visited_vertex_count++] = u;
 
-        ui u_nbrs_count;
         u_nbr_dist = u_dist + 1;
-        const VertexID* u_nbrs = graph->getVertexNeighbors(u, u_nbrs_count);
+        u_nbrs = graph->getVertexNeighbors(u, u_nbrs_count);
+        //std::cout << "Vertex u : " << u << " Neighbor Count : " << u_nbrs_count << std::endl;
         for (ui i = 0; i < u_nbrs_count; ++i) {
             u_nbr = u_nbrs[i];
 
@@ -153,12 +156,32 @@ AlgorithmStore::bfsTraversalWithDistance(const Graph *graph, VertexID root_verte
                     bfs_queue.push(u_nbr);
                     visited[u_nbr] = true;
                     distance_array[u_nbr] = u_nbr_dist;
+                    explored_vertices[explored_vertices_count++] = u_nbr;
                 }
                 if (u_nbr_dist == distance){
                     path_count[u_nbr] += 1;
                 }
             }
         }
+    }
+
+    /*std::cout << "Distance Array : " ;
+    for (ui i = 0; i < vertex_num; i++){
+        std::cout << distance_array[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Path Count Array : " ;
+    for (ui i = 0; i < vertex_num; i++){
+        std::cout << path_count[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Explored Vertices in BFS : ";*/
+    for (ui i = 0; i < explored_vertices_count; i++){
+        //std::cout << explored_vertices[i] << " ";
+        distance_array[explored_vertices[i]] = 0;
+        visited[explored_vertices[i]] = false;
     }
 
 }
