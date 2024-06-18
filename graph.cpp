@@ -634,8 +634,8 @@ std::vector<std::pair<VertexID, VertexID>> Graph::getUniqueEdges(const std::stri
 
     while(infile >> begin) {
         infile >> end >> weight;
-        std::cout << "Edge : " << begin << " -> " << end << std::endl;
-        edge_vtr.push_back(std::make_pair(begin, end));
+        //std::cout << "Edge : " << begin << " -> " << end << std::endl;
+        edge_vtr.push_back(std::make_pair(begin - 1, end - 1));
     }
     infile.close();
 
