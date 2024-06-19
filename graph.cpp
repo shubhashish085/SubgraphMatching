@@ -723,7 +723,19 @@ void Graph::loadGraphFromFileForTriangle(const std::string& file_path){
 
     for (ui i = 0; i < vertices_count; ++i) {
         std::sort(neighbors + offsets[i], neighbors + offsets[i + 1]); // sorting the neighbors of every vertex
+
+        if(i >=  1) {
+            for (ui j = offsets[i]; j < offsets[i + 1] - 1; j++) {
+                if (neighbors[j] == neighbors[j + 1]) {
+                    std::cout << " Match Found " << i << " : " << " j : " << j << " : " << neighbors[j] << " j+1 : "
+                              << neighbors[j + 1] << std::endl;
+                }
+            }
+        }
     }
+
+
+    std::cout << std::endl;
 
 
     //BuildReverseIndex();

@@ -9,7 +9,7 @@
 #include <map>
 #include <iostream>
 enum OptionKeyword {
-    QueryGraphFile = 0,     // -q, The query graph file path, compulsive parameter
+    //QueryGraphFile = 0,     // -q, The query graph file path, compulsive parameter
     DataGraphFile = 1,      // -d, The data graph file path, compulsive parameter
     OutputFilePath = 2      // -output, the output file path, compulsive parameter
 };
@@ -29,9 +29,9 @@ public:
         return options_value[OptionKeyword::DataGraphFile];
     }
 
-    std::string getQueryGraphFilePath() {
+    /*std::string getQueryGraphFilePath() {
         return options_value[OptionKeyword::QueryGraphFile];
-    }
+    }*/
 
     std::string getOutputFilePath(){
         return options_value[OptionKeyword::OutputFilePath];

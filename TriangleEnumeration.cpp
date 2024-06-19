@@ -58,10 +58,6 @@ size_t TriangleEnumerate::enumerateTriangles(const Graph* data_graph, std::vecto
         }
     }
 
-    /*std::cout << "1. The level of the vertices - " << std::endl;
-    for(ui i = 0; i < vertex_num; i++){
-        std::cout << level[i] << " ";
-    }*/
 
     std::cout << std::endl;
 
@@ -104,16 +100,6 @@ size_t TriangleEnumerate::enumerateTriangles(const Graph* data_graph, std::vecto
 
     }
 
-    /*std::cout << "Similar Level Edge Count : " << edge_sg_count << std::endl;
-    std::cout << "Different Level Edge Count : " << edge_dg_count << std::endl;*/
-
-
-    /*std::cout << "3. Short Vertex Map Indices : " << std::endl;
-    for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
-        std::cout << "Index : " << map_iter->first << std::endl;
-    }*/
-
-    //std::cout << "Setting Offset" << std::endl;
 
     for(ui i = 0; i < vertex_num; i++){
         offsets_sg[i + 1] = offsets_sg[i] + degree_sg[i];
@@ -150,51 +136,33 @@ size_t TriangleEnumerate::enumerateTriangles(const Graph* data_graph, std::vecto
         }
     }
 
-    /*std::cout << "Offsets of Similar Graph : " << std::endl;
-    for(ui i = 0; i < vertex_num; i++){
-        std::cout << offsets_sg[i] << " " ;
-    }
-    std::cout << offsets_sg[vertex_num] << std::endl;
-
-    std::cout << "Neighbors of Similar Graph : " << std::endl;
-    for(ui i = 0; i < edge_sg_count * 2; i++){
-        std::cout << neighbors_sg[i] << " " << std::endl;
-    }
-
-
-    std::cout << "Offsets of Different Graph : " << std::endl;
-    for(ui i = 0; i < vertex_num; i++){
-        std::cout << offsets_dg[i] << " " ;
-    }
-    std::cout << offsets_dg[vertex_num] << std::endl;
-    std::cout << "Neighbors of Different Graph : " << std::endl;
-    for(ui i = 0; i < edge_dg_count * 2; i++){
-        std::cout << neighbors_dg[i] << " ";
-    }
-
-    std::cout << std::endl;*/
 
     Graph* graph_sg = new Graph(vertex_num, edge_sg_count, offsets_sg, neighbors_sg);
     Graph* graph_dg = new Graph(vertex_num, edge_dg_count, offsets_dg, neighbors_dg);
 
-
     for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
 
-        //Triangle Counting for same level vertices
-        //std::cout << "BFS started in the similar level graph " << std::endl;
         AlgorithmStore::bfsTraversalWithDistance(graph_sg, map_iter->first, distance_array, explored_vertices, visited, two_hop_path_count_sg, distance);
-
-        //Triangle Counting for different level vertices
-        //std::cout << "BFS started in the different level graph " << std::endl;
-        AlgorithmStore::bfsTraversalWithDistance(graph_dg, map_iter->first, distance_array, explored_vertices, visited, two_hop_path_count_dg, distance);
 
         for (auto vtr_iter = (map_iter->second).begin(); vtr_iter != (map_iter->second).end(); vtr_iter++){
             triangle_count += two_hop_path_count_sg[*vtr_iter];
-            triangle_count += two_hop_path_count_dg[*vtr_iter];
             two_hop_path_count_sg[*vtr_iter] = 0;
-            two_hop_path_count_dg[*vtr_iter] = 0;
         }
 
+    }
+
+    triangle_count /= 3;
+
+
+    for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
+
+        AlgorithmStore::bfsTraversalWithDistance(graph_dg, map_iter->first, distance_array, explored_vertices, visited, two_hop_path_count_dg, distance);
+
+        for (auto vtr_iter = (map_iter->second).begin(); vtr_iter != (map_iter->second).end(); vtr_iter++){
+
+            triangle_count += two_hop_path_count_dg[*vtr_iter];
+            two_hop_path_count_dg[*vtr_iter] = 0;
+        }
 
     }
 

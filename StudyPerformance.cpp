@@ -620,10 +620,10 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 //For Triangle Counting
 int main(int argc, char** argv) {
 
-    //MatchingCommand command(argc, argv);
+    MatchingCommand command(argc, argv);
     //std::string input_query_graph_file = command.getQueryGraphFilePath();
-    //std::string input_data_graph_file = command.getDataGraphFilePath();
-    //std::string output_performance_file = command.getOutputFilePath();
+    std::string input_data_graph_file = command.getDataGraphFilePath();
+    std::string output_file_path = command.getOutputFilePath();
 
     size_t call_count = 0;
     size_t output_limit = std::numeric_limits<size_t>::max();
@@ -631,18 +631,30 @@ int main(int argc, char** argv) {
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt";
-    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
     //std::string input_data_graph_file = "../triangle_dataset/data_graph_4_wo_label_0_index.graph";
 
     Graph* data_graph = new Graph();
-    //data_graph->loadGraphFromFileFromTsv(input_data_graph_file);
     data_graph->loadGraphFromFileForTriangle(input_data_graph_file);
-    //std::vector<std::pair<VertexID, VertexID>> edge_vtr = data_graph->getUniqueEdges(edge_file);
     ui* result_array = new ui[data_graph->getVerticesCount()];
 
+    double start_time, end_time;
+
     std::cout << "Counting Triangles" << std::endl;
+    start_time = wtime();
     size_t numberOfTriangles = TriangleEnumerate::enumerateTriangles(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
+    end_time = wtime();
     //size_t numberOfTriangles = TriangleEnumerate::enumerateTrianglesBySetIntersection(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
 
+    std::ofstream outputfile;
+    outputfile.open(output_file_path, std::ios::app);
+
+    outputfile << "Enumerate time (seconds) : " << end_time - start_time << std::endl;
+    outputfile << "Number of Unique Triangles : " << numberOfTriangles << std::endl;
+
+    outputfile.flush();
+    outputfile.close();
+
     std::cout << "Number of Triangles : " << numberOfTriangles << std::endl;
+
 }
