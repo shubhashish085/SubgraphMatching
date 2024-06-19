@@ -14,6 +14,8 @@ public:
 
     static void set_intersection_tp(VertexID * result, ui l_length, VertexID * r_array, ui r_length, ui& set_ints_length);
 
+    static void set_intersection_triangle_count(VertexID * l_array, ui l_length, VertexID * r_array, ui r_length, ui& set_ints_length);
+
     static void set_intersection_with_maximum_bound(VertexID *result, ui l_length, VertexID *r_array, ui r_length,
             ui &set_ints_length, ui max);
 

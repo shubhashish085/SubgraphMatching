@@ -13,7 +13,8 @@ class TriangleEnumerate {
 public:
     static size_t enumerateTriangles(const Graph* data_graph, std::vector<std::pair<VertexID, VertexID>>& edges, ui* result_array,
                                      size_t &output_limit_num, size_t &call_count);
-    static void buildGraph();
+    static size_t enumerateTrianglesBySetIntersection(const Graph* data_graph, std::vector<std::pair<VertexID, VertexID>>& edges, ui* result_array,
+                                               size_t &output_limit_num, size_t &call_count);
 
 
 

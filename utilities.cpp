@@ -120,6 +120,27 @@ void Utilities::set_intersection_tp(VertexID * result, ui l_length, VertexID * r
 
 }
 
+void Utilities::set_intersection_triangle_count(VertexID * l_array, ui l_length, VertexID * r_array, ui r_length, ui& set_ints_length) {
+
+    int i = 0, j = 0;
+    set_ints_length = 0;
+
+    while (i < l_length && j < r_length) {
+        if (l_array[i] < r_array[j])
+            i++;
+        else if (r_array[j] < l_array[i])
+            j++;
+        else
+        {
+            set_ints_length++;
+            i++;
+            j++;
+        }
+    }
+
+}
+
+
 void Utilities::set_intersection(VertexID *r_array, ui &r_count,
                                  VertexID *valid_candidate, ui &candidate_count) {
 

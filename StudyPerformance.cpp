@@ -630,15 +630,19 @@ int main(int argc, char** argv) {
 
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
-    std::string input_data_graph_file = "../triangle_dataset/data_graph_4_wo_label.graph";
-    std::string edge_file = "../triangle_dataset/data_graph_4_wo_label.graph";
+    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    //std::string input_data_graph_file = "../triangle_dataset/data_graph_4_wo_label_0_index.graph";
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileFromTsv(input_data_graph_file);
-    std::vector<std::pair<VertexID, VertexID>> edge_vtr = data_graph->getUniqueEdges(edge_file);
+    //data_graph->loadGraphFromFileFromTsv(input_data_graph_file);
+    data_graph->loadGraphFromFileForTriangle(input_data_graph_file);
+    //std::vector<std::pair<VertexID, VertexID>> edge_vtr = data_graph->getUniqueEdges(edge_file);
     ui* result_array = new ui[data_graph->getVerticesCount()];
 
-    size_t numberOfTriangles = TriangleEnumerate::enumerateTriangles(data_graph, edge_vtr, result_array, output_limit, call_count);
+    std::cout << "Counting Triangles" << std::endl;
+    size_t numberOfTriangles = TriangleEnumerate::enumerateTriangles(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
+    //size_t numberOfTriangles = TriangleEnumerate::enumerateTrianglesBySetIntersection(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
 
     std::cout << "Number of Triangles : " << numberOfTriangles << std::endl;
 }

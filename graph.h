@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 #include "types.h"
 
 class Graph{
@@ -30,7 +31,7 @@ private:
     ui* labels_offsets;
 
 public:
-
+    std::vector<std::pair<VertexID, VertexID>> edge_vtr;
     Graph() {
 
         vertices_count = 0;
@@ -60,6 +61,12 @@ public:
         labels = NULL;
         offsets = offset_array;
         neighbors = neighbor_array;
+
+        std::cout << "Sorting the neighbors" << std::endl;
+        for (ui i = 0; i < vertices_count; ++i) {
+            std::sort(neighbors + offsets[i], neighbors + offsets[i + 1]); // sorting the neighbors of every vertex
+        }
+
     }
 
     ~Graph() {
@@ -76,6 +83,7 @@ public:
     void loadGraphFromFile(const std::string& file_path);
     void loadGraphFromFileWithEdge(const std::string& file_path);
     void loadGraphFromFileWithoutStringConversion(const std::string& file_path);
+    void loadGraphFromFileForTriangle(const std::string& file_path);
     void loadGraphFromFileFromTsv(const std::string& file_path);
     void checkGraphDirectedOrUndirected(const std::string& file_path);
     void loadGraphFromFileForWeakScaling(const std::string& file_path, ui division_factor);
