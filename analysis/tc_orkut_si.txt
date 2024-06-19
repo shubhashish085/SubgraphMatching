@@ -1,0 +1,2 @@
+Enumerate time (seconds) : 106.885
+Number of Unique Triangles : 627566583

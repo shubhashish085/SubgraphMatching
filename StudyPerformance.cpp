@@ -642,9 +642,10 @@ int main(int argc, char** argv) {
 
     std::cout << "Counting Triangles" << std::endl;
     start_time = wtime();
-    size_t numberOfTriangles = TriangleEnumerate::enumerateTriangles(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
+    //size_t numberOfTriangles = TriangleEnumerate::enumerateTriangles(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
+
+    size_t numberOfTriangles = TriangleEnumerate::enumerateTrianglesBySetIntersection(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
     end_time = wtime();
-    //size_t numberOfTriangles = TriangleEnumerate::enumerateTrianglesBySetIntersection(data_graph, data_graph->edge_vtr, result_array, output_limit, call_count);
 
     std::ofstream outputfile;
     outputfile.open(output_file_path, std::ios::app);

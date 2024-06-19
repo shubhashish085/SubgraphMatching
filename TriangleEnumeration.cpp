@@ -304,18 +304,6 @@ size_t TriangleEnumerate::enumerateTrianglesBySetIntersection(const Graph* data_
     VertexID* u_nbrs;
     VertexID* v_nbrs;
 
-    //different level vertices graph
-    for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
-
-        u_nbrs = graph_dg->getVertexNeighbors(map_iter->first, u_nbr_cnt);
-
-        for (auto vtr_iter = (map_iter->second).begin(); vtr_iter != (map_iter->second).end(); vtr_iter++){
-            v_nbrs = graph_dg->getVertexNeighbors(*vtr_iter, v_nbr_cnt);
-            Utilities::set_intersection_triangle_count(u_nbrs, u_nbr_cnt, v_nbrs, v_nbr_cnt, intersection_length);
-            triangle_count += intersection_length;
-        }
-    }
-
     //same level vertices graph
     for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
 
@@ -323,6 +311,20 @@ size_t TriangleEnumerate::enumerateTrianglesBySetIntersection(const Graph* data_
 
         for (auto vtr_iter = (map_iter->second).begin(); vtr_iter != (map_iter->second).end(); vtr_iter++){
             v_nbrs = graph_sg->getVertexNeighbors(*vtr_iter, v_nbr_cnt);
+            Utilities::set_intersection_triangle_count(u_nbrs, u_nbr_cnt, v_nbrs, v_nbr_cnt, intersection_length);
+            triangle_count += intersection_length;
+        }
+    }
+
+    triangle_count /= 3;
+
+    //different level vertices graph
+    for (auto map_iter = u_w_map.begin(); map_iter != u_w_map.end(); map_iter++){
+
+        u_nbrs = graph_dg->getVertexNeighbors(map_iter->first, u_nbr_cnt);
+
+        for (auto vtr_iter = (map_iter->second).begin(); vtr_iter != (map_iter->second).end(); vtr_iter++){
+            v_nbrs = graph_dg->getVertexNeighbors(*vtr_iter, v_nbr_cnt);
             Utilities::set_intersection_triangle_count(u_nbrs, u_nbr_cnt, v_nbrs, v_nbr_cnt, intersection_length);
             triangle_count += intersection_length;
         }
