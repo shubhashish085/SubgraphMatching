@@ -128,7 +128,9 @@ ui* GeneratingFilterPlan::generateLoadBalacePlan(const Graph *data_graph, const 
 
     ui* predicted_cardinality = new ui[data_graph -> getVerticesCount()];
 
-    memset(predicted_cardinality, 0, sizeof(ui) * (data_graph -> getVerticesCount()));
+    for(ui i = 0; i < data_graph -> getVerticesCount(); i++){
+        predicted_cardinality[i] = 0;
+    }
 
     VertexID start_vertex = order[0];
     VertexID second_vertex = order[1];

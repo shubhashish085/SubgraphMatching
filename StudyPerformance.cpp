@@ -966,8 +966,8 @@ int main(int argc, char** argv) {
 
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
     //analyseParallelizationWithDynamicLoadBalance(query_graph, data_graph, output_performance_file);
-    //analyseResult(query_graph, data_graph, output_performance_file);
-    analyseParallelizationWithDynamicLoadBalanceForAnalysis(query_graph, data_graph, output_performance_file);
+    analyseResult(query_graph, data_graph, output_performance_file);
+    //analyseParallelizationWithDynamicLoadBalanceForAnalysis(query_graph, data_graph, output_performance_file);
 
 
     /*for(ui i = 0; i < 4; i++) {
