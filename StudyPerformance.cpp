@@ -939,16 +939,16 @@ int main(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-    MatchingCommand command(argc, argv);
+    /*MatchingCommand command(argc, argv);
     std::string input_query_graph_file = command.getQueryGraphFilePath();
     std::string input_data_graph_file = command.getDataGraphFilePath();
-    std::string output_performance_file = command.getOutputFilePath();
+    std::string output_performance_file = command.getOutputFilePath();*/
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/roadNet-CA.txt";
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
@@ -957,16 +957,16 @@ int main(int argc, char** argv) {
 
     //std::string output_file = "../analysis/sample_test_parallel_weak_scaling.txt";
 
-    Graph* query_graph = new Graph();
-    query_graph->loadGraphFromFile(input_query_graph_file);
+    //Graph* query_graph = new Graph();
+    //query_graph->loadGraphFromFile(input_query_graph_file);
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
-
+    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    data_graph->loadDirectedGraphFromFile(input_data_graph_file);
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
     //analyseParallelizationWithDynamicLoadBalance(query_graph, data_graph, output_performance_file);
-    analyseResult(query_graph, data_graph, output_performance_file);
+    //analyseResult(query_graph, data_graph, output_performance_file);
     //analyseParallelizationWithDynamicLoadBalanceForAnalysis(query_graph, data_graph, output_performance_file);
 
 
