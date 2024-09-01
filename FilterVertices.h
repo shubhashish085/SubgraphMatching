@@ -15,6 +15,7 @@ class FilterVertices {
 public:
     static bool LDFFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count);
     static bool NLFFilter(const Graph* data_graph, const Graph* query_graph, ui** &candidates, ui* &candidates_count);
+    static bool NLFAndLDFFilter(const Graph* data_graph, const Graph* query_graph, ui** &candidates, ui* &candidates_count);
     static bool CFLFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree);
 

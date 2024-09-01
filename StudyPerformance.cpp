@@ -338,7 +338,8 @@ void analyseFiltering(Graph* query_graph, Graph* data_graph, const std::string& 
     ui filtered_candidate_count = 0;
     bool* candidate_trace = new bool[data_graph -> getVerticesCount()];
 
-    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+    //FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+    FilterVertices::NLFAndLDFFilter(data_graph, query_graph, candidates, candidates_count);
     std::fill(candidate_trace, candidate_trace + data_graph -> getVerticesCount(), false);
 
     for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
@@ -353,11 +354,11 @@ void analyseFiltering(Graph* query_graph, Graph* data_graph, const std::string& 
         }
     }
 
-    std::cout << " Query Graph : " << std::endl;
+    std::cout << "---- Query Graph ---- " << std::endl;
     query_graph -> printGraphMetaData();
-    std::cout << " Data Graph : " << std::endl;
+    std::cout << "---- Data Graph ----- " << std::endl;
     data_graph -> printGraphMetaData();
-    std::cout << " Filtered Vertex Count : " << filtered_candidate_count << std::endl;
+    std::cout << "Filtered Vertex Count : " << filtered_candidate_count << std::endl;
 
 }
 
