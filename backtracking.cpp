@@ -34,7 +34,7 @@ AlgorithmStore :: DFSTraversal(const Graph *graph, VertexID start_node, std::vec
 void
 AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, TreeNode *&tree, VertexID *&bfs_order) {
 
-    std::cout << "########################## BFS Traversal ############################" << std::endl;
+    //std::cout << "########################## BFS Traversal ############################" << std::endl;
 
     ui vertex_num = graph->getVerticesCount();
 
@@ -74,7 +74,7 @@ AlgorithmStore::bfsTraversal(const Graph *graph, VertexID root_vertex, TreeNode 
         }
     }
 
-    std::cout << "########################## End BFS Traversal ############################" << std::endl;
+    //std::cout << "########################## End BFS Traversal ############################" << std::endl;
 
 }
 

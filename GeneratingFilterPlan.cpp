@@ -13,7 +13,7 @@
 VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_graph, const Graph *query_graph) {
     //min heap
 
-    std::cout << " #################### selectCFLFilterStartVertex ############## " << std::endl;
+    //std::cout << " #################### selectCFLFilterStartVertex ############## " << std::endl;
     auto rank_compare = [](std::pair<VertexID, double> l, std::pair<VertexID, double> r) {
         return l.second < r.second;
     };
@@ -62,7 +62,7 @@ VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_grap
 void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                                   VertexID *&order, int &level_count, ui *&level_offset) {
 
-    std::cout << " #################### GenerateCFLFilterPlan ############## " << std::endl;
+    //std::cout << " #################### GenerateCFLFilterPlan ############## " << std::endl;
 
     ui query_vertices_num = query_graph->getVerticesCount();
     VertexID start_vertex = selectCFLFilterStartVertex(data_graph, query_graph);
@@ -163,7 +163,7 @@ ui* GeneratingFilterPlan::generateLoadBalacePlan(const Graph *data_graph, const 
 void GeneratingFilterPlan::generateCFLFilterPlanForDirectedGraph(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                                  VertexID *&order, int &level_count, ui *&level_offset) {
 
-    std::cout << " #################### GenerateCFLFilterPlanForDirectedGraph ############## " << std::endl;
+    //std::cout << " #################### GenerateCFLFilterPlanForDirectedGraph ############## " << std::endl;
 
     ui query_vertices_num = query_graph->getVerticesCount();
     VertexID start_vertex = selectCFLFilterStartVertex(data_graph, query_graph);

@@ -328,6 +328,40 @@ void exploreByRecursion(const Graph *data_graph, const Graph *query_graph, ui **
 
 }
 
+
+void analyseFiltering(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    ui filtered_candidate_count = 0;
+    bool* candidate_trace = new bool[data_graph -> getVerticesCount()];
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+    std::fill(candidate_trace, candidate_trace + data_graph -> getVerticesCount(), false);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            candidate_trace[candidates[i][j]] = true;
+        }
+    }
+
+    for(ui i = 0; i < data_graph -> getVerticesCount(); i++){
+        if(candidate_trace[i]){
+            filtered_candidate_count += 1;
+        }
+    }
+
+    std::cout << " Query Graph : " << std::endl;
+    query_graph -> printGraphMetaData();
+    std::cout << " Data Graph : " << std::endl;
+    data_graph -> printGraphMetaData();
+    std::cout << " Filtered Vertex Count : " << filtered_candidate_count << std::endl;
+
+}
+
+
 void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
 
     ui* matching_order = NULL;
@@ -936,13 +970,34 @@ int main(int argc, char** argv) {
 }
 */
 
+// Filtering Statistics
+int main(int argc, char** argv) {
 
+    MatchingCommand command(argc, argv);
+    std::string input_query_graph_file = command.getQueryGraphFilePath();
+    std::string input_data_graph_file = command.getDataGraphFilePath();
+    std::string output_performance_file = command.getOutputFilePath();
+
+
+    std::cout << " Query Graph : " << input_query_graph_file << std::endl;
+    Graph* query_graph = new Graph();
+    query_graph->loadGraphFromFile(input_query_graph_file);
+    //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
+
+    std::cout << " Data Graph : " << input_data_graph_file << std::endl;
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+
+    analyseFiltering(query_graph, data_graph, output_performance_file);
+}
+
+/*
 int main(int argc, char** argv) {
 
     /*MatchingCommand command(argc, argv);
     std::string input_query_graph_file = command.getQueryGraphFilePath();
     std::string input_data_graph_file = command.getDataGraphFilePath();
-    std::string output_performance_file = command.getOutputFilePath();*/
+    std::string output_performance_file = command.getOutputFilePath();
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
@@ -986,9 +1041,9 @@ int main(int argc, char** argv) {
 
         //analyseParallelizationForWeakScaling(query_graph, data_graph, output_file, division_factor[i]);
 
-    }*/
+    }
 
-}
+}*/
 
 
 

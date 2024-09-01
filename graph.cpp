@@ -358,13 +358,13 @@ void Graph::loadGraphFromFileWithWeight(const std::string& file_path){
 
     }
 
-    std::cout << "Line count " << line_count << std::endl;
+    //std::cout << "Line count " << line_count << std::endl;
 
     input_file.close();
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
     for (auto element : labels_frequency) {
-        std::cout << " Max Label Frequency : " << element.second << std::endl;
+        //std::cout << " Max Label Frequency : " << element.second << std::endl;
         if (element.second > max_label_frequency) {
             max_label_frequency = element.second;
         }
@@ -396,7 +396,7 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
     std::string input_line;
     ui label = 0;
 
-    std::cout << "Reading File............ " << std::endl;
+    //std::cout << "Reading File............ " << std::endl;
 
     ui line_count = 0, count = 0, comment_line_count = 4;
 
@@ -417,19 +417,14 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
                     if (!(token.rfind("#", 0) == 0 || token.rfind("Nodes:", 0) == 0 || token.rfind("Edges:", 0) == 0)) {
                         if (count == 0) {
                             vertices_count = stoi(token);
-                            std::cout << "Vertex Count : " << vertices_count << std::endl;
                             degrees = new ui[vertices_count];
                             std::fill(degrees, degrees + vertices_count, 0);
-                            /*for (int i = 0; i < vertices_count; i++) {
-                                degrees[i] = 0;
-                            }*/
                             count = 1;
                         } else {
                             edges_count = stoi(token);
                             count = 0;
                         }
-                        std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
-                                  << std::endl;
+
                     }
                 }
             }
@@ -466,7 +461,7 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
     labels_count = 0;
     max_degree = 0;
 
-    std::cout << "Initialization Finished" << std::endl;
+    //std::cout << "Initialization Finished" << std::endl;
 
     LabelID max_label_id = 0, begin_vtx_label, end_vtx_label;
     std::vector<ui> neighbors_offset(vertices_count, 0);// used for adjust neighbors with offset
@@ -529,13 +524,13 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
 
     }
 
-    std::cout << "Line count " << line_count << std::endl;
+    //std::cout << "Line count " << line_count << std::endl;
 
     input_file.close();
     labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
 
     for (auto element : labels_frequency) {
-        std::cout << " Max Label Frequency : " << element.second << std::endl;
+        //std::cout << " Max Label Frequency : " << element.second << std::endl;
         if (element.second > max_label_frequency) {
             max_label_frequency = element.second;
         }
@@ -901,8 +896,6 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
 
     }
 
-    std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
-              << std::endl;
 
     infile.close();
 

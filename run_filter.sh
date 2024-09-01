@@ -1,0 +1,26 @@
+#! /bin/bash
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_4_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_4_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_4_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_4_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_4_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_5_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_5_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_5_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_5_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_5_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-amazon.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt -output ../analysis/output.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt -output ../analysis/output.txt

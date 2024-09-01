@@ -56,7 +56,7 @@ bool
 FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree) {
 
-    std::cout << "############### CFL Filter ########################" << std::endl;
+    //std::cout << "############### CFL Filter ########################" << std::endl;
 
     allocateBuffer(data_graph, query_graph, candidates, candidates_count);
     int level_count;
@@ -72,19 +72,12 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
     VertexID start_vertex = order[0];
     computeCandidateWithNLF(data_graph, query_graph, start_vertex, candidates_count[start_vertex], candidates[start_vertex]);
 
-    std::cout << "Candidate Count Before Generation : " << std::endl;
-    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-    }
-
-
 
 
     ui* updated_flag = new ui[data_graph->getVerticesCount()];
     ui* flag = new ui[data_graph->getVerticesCount()];
     std::fill(flag, flag + data_graph->getVerticesCount(), 0);
 
-    std::cout << "Top down Generation" << std::endl;
     // Top-down generation.
     for (int i = 1; i < level_count; ++i) {
         // Forward generation.
@@ -94,10 +87,9 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
             generateCandidates(data_graph, query_graph, query_vertex, node.bn_, node.bn_count_, candidates, candidates_count, flag, updated_flag);
         }
 
-        std::cout << "Candidate Count After Generation : " << std::endl;
-        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-        }
+//        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+//            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+//        }
 
 
         // Backward prune.
@@ -110,10 +102,10 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
             }
         }
 
-        std::cout << "Candidate Count After Pruning : " << std::endl;
-        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-        }
+//        std::cout << "Candidate Count After Pruning : " << std::endl;
+//        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+//            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+//        }
     }
 
 
@@ -144,7 +136,7 @@ void FilterVertices::generateCandidates(const Graph *data_graph, const Graph *qu
 
     //flag is track/count of the connection of node with the back neighbors
 
-    std::cout << "################# generateCandidates #############" << std::endl;
+    //std::cout << "################# generateCandidates #############" << std::endl;
 
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);
@@ -216,7 +208,7 @@ void FilterVertices::pruneCandidates(const Graph *data_graph, const Graph *query
                      VertexID *pivot_vertices, ui pivot_vertices_count, VertexID **candidates,
                      ui *candidates_count, ui *flag, ui *updated_flag) {
 
-    std::cout << "################# pruneCandidates #############" << std::endl;
+    //std::cout << "################# pruneCandidates #############" << std::endl;
 
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);
@@ -271,7 +263,7 @@ void FilterVertices::pruneCandidates(const Graph *data_graph, const Graph *query
 
 void FilterVertices::allocateBuffer(const Graph *data_graph, const Graph *query_graph, ui **&candidates,
                                     ui *&candidates_count) {
-    std::cout << "############## Allocating Buffer ##############" << std::endl;
+    //std::cout << "############## Allocating Buffer ##############" << std::endl;
     ui query_vertex_num = query_graph->getVerticesCount();
     ui candidates_max_num = data_graph->getGraphMaxLabelFrequency(); // candidate number of any vertex can be at most the maximum label frequency of
     //  any label in the data graph
@@ -282,7 +274,7 @@ void FilterVertices::allocateBuffer(const Graph *data_graph, const Graph *query_
     candidates = new ui*[query_vertex_num]; // storing the candidates for every vertex in the query graph
 
     for (ui i = 0; i < query_vertex_num; ++i) {
-        std::cout << "Candidates Max Num : " << candidates_max_num << std::endl;
+        //std::cout << "Candidates Max Num : " << candidates_max_num << std::endl;
         candidates[i] = new ui[candidates_max_num];
     }
 }
@@ -315,7 +307,7 @@ void
 FilterVertices::computeCandidateWithNLF(const Graph *data_graph, const Graph *query_graph, VertexID query_vertex,
                                         ui &count, ui *buffer) {
     //<SK>
-    printf("######### In computeCandidateWithNLF #############\n");
+    //printf("######### In computeCandidateWithNLF #############\n");
     //</SK>
     LabelID label = query_graph->getVertexLabel(query_vertex);
     ui degree = query_graph->getVertexDegree(query_vertex);
