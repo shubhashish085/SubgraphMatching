@@ -836,6 +836,9 @@ void Graph::loadGraphFromFile(const std::string &file_path) {
 
 }
 
+
+
+
 void Graph::loadDirectedGraphFromFile(const std::string& file_path){
 
     std::cout << "############# Loading Directed Graph With Edges ###############" << std::endl;
@@ -872,15 +875,13 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
                     if (!(token.rfind("#", 0) == 0 || token.rfind("Nodes:", 0) == 0 || token.rfind("Edges:", 0) == 0)) {
                         if (count == 0) {
                             vertices_count = stoi(token);
-                            std::cout << "Vertex Count : " << vertices_count << std::endl;
                             degrees = new ui[vertices_count];
                             std::fill(degrees, degrees + vertices_count, 0);
                             count = 1;
                         } else {
                             count = 0;
                         }
-                        std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
-                                  << std::endl;
+
                     }
                 }
             }
@@ -918,6 +919,9 @@ void Graph::loadDirectedGraphFromFile(const std::string& file_path){
         }
 
     }
+
+    std::cout << "Vertices Count : " << vertices_count << " Edges Count : " << edges_count
+              << std::endl;
 
     infile.close();
 
