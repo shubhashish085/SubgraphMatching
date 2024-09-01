@@ -209,6 +209,25 @@ void Graph::loadGraphFromFileWithEdge(const std::string& file_path){
     //printGraphData();
 }
 
+void Graph::printGraphDegreeData(){
+
+    ui total_degree = 0;
+    ui max_degree = 0;
+
+    for (ui i = 0; i < vertices_count; i++){
+        total_degree += degrees[i];
+        if(degrees[i] > max_degree){
+            max_degree = degrees[i];
+        }
+    }
+
+    double avg_degree = ((double) total_degree)/ vertices_count;
+
+    std::cout << " Average Degree : " << avg_degree << std::endl;
+    std::cout << " Maximum Degree : " << max_degree << std::endl;
+
+}
+
 void Graph::loadGraphFromFileWithWeight(const std::string& file_path){
 
     std::cout << "############# Loading Graph With Edges ###############" << std::endl;

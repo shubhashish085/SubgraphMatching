@@ -70,6 +70,7 @@ public:
     void loadGraphFromFileWithWeight(const std::string& file_path);
     void loadDirectedGraphFromFile(const std::string& file_path);
     void printGraphMetaData();
+    void printGraphDegreeData();
     void setMatchingOrderIndex(std::vector<ui> matching_order);
 
 public:

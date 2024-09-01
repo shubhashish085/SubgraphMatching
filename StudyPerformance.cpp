@@ -364,7 +364,7 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
     std::cout << "Serial Stack Based Strategy Embedding Count : " << embedding_count << " Call Count : " << call_count << std::endl;
     std::cout << "Time " << end_time - start_time << std::endl;
 
-    std::ofstream outputfile;
+    /*std::ofstream outputfile;
     outputfile.open(output_file_path, std::ios::app);
 
     outputfile << "Enumerate time (seconds): " << end_time - start_time << std::endl;
@@ -379,7 +379,7 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
 
 
     outputfile.flush();
-    outputfile.close();
+    outputfile.close();*/
 
 
 }
@@ -784,7 +784,7 @@ void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::st
     size_t call_count = 0;
     ui loop_count = 1;
     //int thread_count[] = {2, 4, 8, 16};
-    int thread_count[] = {2};
+    int thread_count[] = {8};
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
     ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
@@ -809,7 +809,8 @@ void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::st
         call_count = 0;
 
         start_time = wtime();
-        ui** embedding_cnt_array = ParallelEnumeration::exploreWithPadding(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i]);
+        //ui** embedding_cnt_array = ParallelEnumeration::exploreWithPadding(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i]);
+        ui** embedding_cnt_array = ParallelEnumeration::exploreWithPaddingAndSetIntersection(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i]);
         for(ui idx = 0; idx < thread_count[i]; idx++){
             embedding_count += embedding_cnt_array[idx][0];
         }
@@ -937,7 +938,7 @@ int main(int argc, char** argv) {
 */
 
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     MatchingCommand command(argc, argv);
     std::string input_query_graph_file = command.getQueryGraphFilePath();
@@ -962,11 +963,13 @@ int main(int argc, char** argv) {
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    data_graph->loadDirectedGraphFromFile(input_data_graph_file);
 
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_performance_file);
     //analyseParallelizationWithDynamicLoadBalance(query_graph, data_graph, output_performance_file);
     analyseResult(query_graph, data_graph, output_performance_file);
+    //analyseParallelization(query_graph, data_graph, output_performance_file);
     //analyseParallelizationWithDynamicLoadBalanceForAnalysis(query_graph, data_graph, output_performance_file);
 
 
@@ -986,7 +989,36 @@ int main(int argc, char** argv) {
 
         //analyseParallelizationForWeakScaling(query_graph, data_graph, output_file, division_factor[i]);
 
-    }*/
+    }
+
+}*/
+
+int main(int argc, char** argv) {
+
+    std::cout << " Data graph : RoadNet CA " << std::endl;
+    Graph* data_graph = new Graph();
+    data_graph->loadDirectedGraphFromFile("/home/kars1/Parallel_computation/dataset/roadNet-CA.txt");
+    data_graph->printGraphDegreeData();
+
+    std::cout << " Data graph : RoadNet TX " << std::endl;
+    data_graph = new Graph();
+    data_graph->loadDirectedGraphFromFile("/home/kars1/Parallel_computation/dataset/roadNet-TX.txt");
+    data_graph->printGraphDegreeData();
+
+    /*std::cout << " Data graph : Youtube " << std::endl;
+    data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt");
+    data_graph->printGraphDegreeData();
+
+    std::cout << " Data graph : Orkut " << std::endl;
+    data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-orkut.ungraph.txt");
+    data_graph->printGraphDegreeData();
+
+    std::cout << " Data graph : Livejournal " << std::endl;
+    data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt");
+    data_graph->printGraphDegreeData();*/
 
 }
 
