@@ -1,0 +1,3 @@
+/home/kars1/Research_Projects/SubgraphMatching/build/CMakeFiles/SubgraphMatching.out.dir
+/home/kars1/Research_Projects/SubgraphMatching/build/CMakeFiles/edit_cache.dir
+/home/kars1/Research_Projects/SubgraphMatching/build/CMakeFiles/rebuild_cache.dir
