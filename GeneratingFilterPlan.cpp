@@ -56,6 +56,8 @@ VertexID GeneratingFilterPlan::selectCFLFilterStartVertex(const Graph *data_grap
     return start_vertex;
 }
 
+
+
 void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                                   VertexID *&order, int &level_count, ui *&level_offset) {
 
@@ -119,4 +121,102 @@ void GeneratingFilterPlan::generateCFLFilterPlan(const Graph *data_graph, const 
         prev_value = temp;
     }
     level_offset[0] = 0;
+}
+
+void GeneratingFilterPlan::generateCFLFilterPlanForDirectedGraph(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
+                                                 VertexID *&order, int &level_count, ui *&level_offset) {
+
+    std::cout << " #################### GenerateCFLFilterPlanForDirectedGraph ############## " << std::endl;
+
+    ui query_vertices_num = query_graph->getVerticesCount();
+    VertexID start_vertex = selectCFLFilterStartVertex(data_graph, query_graph);
+    AlgorithmStore::bfsTraversal(query_graph, start_vertex, tree, order);
+
+    bool* visited = new bool [query_vertices_num];
+    std::fill(visited, visited + query_vertices_num, false);
+
+    std::vector<ui> order_index(query_vertices_num);
+    for (ui i = 0; i < query_vertices_num; ++i) {
+        VertexID query_vertex = order[i];
+        order_index[query_vertex] = i;
+    }
+
+    level_count = -1;
+    level_offset = new ui[query_vertices_num + 1];
+
+    for (ui i = 0; i < query_vertices_num; ++i){
+
+        VertexID u = order[i];
+
+        tree[u].under_level_count_ = 0;
+        tree[u].bn_count_ = 0;
+        tree[u].fn_count_ = 0;
+
+        if (tree[u].level_ != level_count) {
+            level_count += 1;
+            level_offset[level_count] = 0;
+        }
+
+        level_offset[level_count] += 1;
+
+    }
+
+    level_count += 1;
+
+    for (ui i = 1; i < query_vertices_num; ++i) {
+        VertexID u = order[i];
+
+        for(ui j = 0; j < i; j++){
+            VertexID prev_u = order[j];
+
+            ui prev_u_nbrs_count;
+            const VertexID* prev_u_nbrs = query_graph->getVertexNeighbors(prev_u, prev_u_nbrs_count);
+
+            for(ui k = 0; k < prev_u_nbrs_count; k++){
+                if(prev_u_nbrs[k] == u){
+                    if(tree[prev_u].level_ == tree[u].level_){
+                        tree[prev_u].fn_[tree[prev_u].fn_count_++] = u;
+                        tree[u].bn_[tree[u].bn_count_++] = prev_u;
+                    }
+                    if(tree[prev_u].level_ < tree[u].level_){
+                        tree[prev_u].under_level_[tree[prev_u].under_level_count_++] = u;
+                        tree[u].bn_[tree[u].bn_count_++] = prev_u;
+                    }
+                }
+            }
+
+        }
+
+
+    }
+
+    ui prev_value = 0;
+    for (ui i = 1; i <= level_count; ++i) {
+        ui temp = level_offset[i];
+        level_offset[i] = level_offset[i - 1] + prev_value;
+        prev_value = temp;
+    }
+    level_offset[0] = 0;
+
+    std::cout << "Tree : " << std::endl;
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << "Back Neighbors of vertex " << i << " : " << std::endl;
+        for(ui j = 0; j < tree[i].bn_count_; j++){
+            std::cout << tree[i].bn_[j] << " " ;
+        }
+        std::cout << std::endl;
+
+        std::cout << "Forward Neighbors of vertex " << i << " : " << std::endl;
+        for(ui j = 0; j < tree[i].fn_count_; j++){
+            std::cout << tree[i].fn_[j] << " " ;
+        }
+        std::cout << std::endl;
+
+        std::cout << "Under Level of vertex " << i << " : " << std::endl;
+        for(ui j = 0; j < tree[i].under_level_count_; j++){
+            std::cout << tree[i].under_level_[j] << " " ;
+        }
+        std::cout << std::endl;
+    }
+
 }

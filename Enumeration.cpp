@@ -4,6 +4,8 @@
 
 #include "utilities.h"
 #include "Enumeration.h"
+#include <algorithm>
+#include <map>
 #include <fstream>
 
 /* Tree list implementation */
@@ -40,8 +42,83 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
         }
     }
 
-    //std::cout << " ################## end generateValidCandidates ##################" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "Valid Candidates " << std::endl;
+    for(ui i = 0; i <= depth; i++){
+        for(ui j = 0; j < idx_count[i]; j++){
+            std::cout << valid_candidate[i][j] << " " ;
+        }
+        std::cout << std::endl;
+    }
+
 }
+
+/*
+ * Generating Valid Candidates During Enumeration according to the previous vertex
+ * */
+void Enumerate::generateValidCandidatesWithCandidateCSR(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                    bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count,
+                                                    ui* candidate_offset, ui* candidate_csr){
+
+    VertexID u = order[depth];
+    ui neighbor_count = 0;
+
+    idx_count[depth] = 0;
+
+    std::map<ui, ui> valid_candidate_map;
+    std::map<ui, ui>::iterator search_result;
+
+    for (ui i = 0; i < tree[u].bn_count_; i++){
+        VertexID u_nbr = tree[u].bn_[i];
+        VertexID u_nbr_v = embedding[u_nbr];
+
+        VertexID* neighbors = data_graph ->getVertexNeighbors(u_nbr_v, neighbor_count);
+
+        for(ui j = 0; j < neighbor_count; j++){
+            VertexID v = neighbors[j];
+            //isCandidateCheck
+            for(ui index = candidate_offset[v]; index < candidate_offset[v + 1]; index++){
+                if(candidate_csr[index] == u){
+
+                    if(!visited_vertices[v] ){
+                        search_result = valid_candidate_map.find(v);
+
+                        if(search_result != valid_candidate_map.end()){
+                            valid_candidate_map[v] = search_result -> second + 1;
+                        }else{
+                            valid_candidate_map[v] = 1;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    std::map<ui, ui>::iterator it = valid_candidate_map.begin();
+
+    ui bn_cout = tree[u].bn_count_;
+    // Iterate through the map and print the elements
+    while (it != valid_candidate_map.end()) {
+        if(it -> second == bn_cout) {
+            valid_candidate[depth][idx_count[depth]++] = it->first;
+        }
+        ++it;
+    }
+
+    /*std::cout << "Valid Candidates " << std::endl;
+    for(ui i = 0; i <= depth; i++){
+        for(ui j = 0; j < idx_count[i]; j++){
+            std::cout << valid_candidate[i][j] << " " ;
+        }
+        std::cout << std::endl;
+    }*/
+
+
+
+}
+
 
 void Enumerate::generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
                                         ui **valid_candidate, bool *visited_vertices, TreeNode *&tree,
@@ -114,6 +191,10 @@ void Enumerate::analyseAndWriteResult(const std::string& file_path, const Graph 
     outputfile.close();
 }
 
+
+/*
+ * Exploration and analysis of sequential algorithm
+ */
 size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query_graph, ui **candidates,
                           ui *candidates_count, ui *order, TreeNode *& tree, ui* vertex_participation_in_embedding,
                           size_t output_limit_num, size_t &call_count, const std::string& file_path) {
@@ -148,6 +229,47 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         valid_candidate[i] = new VertexID[max_candidate_count];
     }
 
+    // candidate csr building
+    ui* candidate_track = new ui[data_graph->getVerticesCount()];
+    ui* candidate_offset = new ui[data_graph->getVerticesCount() + 1];
+    ui candidate_csr_count = 0;
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        candidate_csr_count += candidates_count[i];
+    }
+
+    ui* candidate_csr = new ui[candidate_csr_count];
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    candidate_offset[0] = 0;
+
+    for(ui i = 1; i < data_graph -> getVerticesCount() + 1; i++){
+        candidate_offset[i] = candidate_offset[i - 1] + candidate_track[i - 1];
+    }
+
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_csr[candidate_offset[data_vertex] + candidate_track[data_vertex]] = i;
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    for (ui i = 0; i < data_graph->getVerticesCount() ; ++i) {
+        std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the query graph parent of every vertex
+    }
+
 
 
     std::cout << "Candidate count of Start Vertex : " << candidates_count[start_vertex] << std::endl;
@@ -172,7 +294,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                 embedding_cnt += 1;
                 visited_vertices[v] = false;
                 //printMatch(embedding, query_graph->getVerticesCount());
-                increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
+                //increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
                 if (embedding_cnt >= output_limit_num) {
                     std::cout << "Output Limit Exceeded" << std::endl;
                     goto EXIT;
@@ -181,8 +303,10 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
                 call_count += 1;
                 cur_depth += 1;
                 idx[cur_depth] = 0;
-                generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                        visited_vertices, tree, order, candidates, candidates_count);
+                /*generateValidCandidates(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                        visited_vertices, tree, order, candidates, candidates_count);*/
+                generateValidCandidatesWithCandidateCSR(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                        visited_vertices, tree, order, candidates, candidates_count, candidate_offset, candidate_csr);
             }
         }
 
@@ -190,7 +314,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         if (cur_depth < 0)
             break;
         else if (cur_depth == 0){
-            std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
+            //std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
             visited_vertices[embedding[order[cur_depth]]] = false;
         }else {
             visited_vertices[embedding[order[cur_depth]]] = false;
@@ -201,7 +325,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
 
     // Release the buffer.
     EXIT:
-    analyseAndWriteResult(file_path, data_graph, query_graph, vertex_participation_in_embedding);
+    //analyseAndWriteResult(file_path, data_graph, query_graph, vertex_participation_in_embedding);
     delete[] idx;
     delete[] idx_count;
     delete[] embedding;

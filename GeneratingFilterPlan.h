@@ -14,6 +14,9 @@ public:
     static void generateCFLFilterPlan(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
                                       VertexID *&order, int &level_count, ui *&level_offset);
 
+    static void generateCFLFilterPlanForDirectedGraph(const Graph *data_graph, const Graph *query_graph, TreeNode *&tree,
+                                      VertexID *&order, int &level_count, ui *&level_offset);
+
 private:
     static VertexID selectCFLFilterStartVertex(const Graph *data_graph, const Graph *query_graph);
 };

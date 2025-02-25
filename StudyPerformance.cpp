@@ -353,6 +353,53 @@ void analyseResult(Graph* query_graph, Graph* data_graph, const std::string& out
 
 }
 
+void analyseParallelization(Graph* query_graph, Graph* data_graph, const std::string& output_file_path){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    int thread_count[] = {2, 4, 8, 16};
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "####### Candidate count  : " ;
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << candidates_count[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    //Parallel Strategy
+    double start_time, end_time;
+
+    std::cout << "Exploration Started" << std::endl;
+    for (ui i = 0; i < 4; i++){
+
+        embedding_count = 0;
+        call_count = 0;
+
+        start_time = wtime();
+        ui** embedding_cnt_array = ParallelEnumeration::exploreWithPadding(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree, output_limit, call_count, thread_count[i]);
+        for(ui idx = 0; idx < thread_count[i]; idx++){
+            embedding_count += embedding_cnt_array[idx][0];
+        }
+
+        end_time = wtime();
+        ParallelEnumeration::writeResult(output_file_path, thread_count[i], call_count, embedding_count);
+
+        std::cout << "Time " << end_time - start_time << std::endl;
+    }
+
+}
+
+
+
 
 void studyPerformance(Graph* query_graph, Graph* data_graph){
 
@@ -443,66 +490,52 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
 }
 
-/*int main(int argc, char** argv) {
-
-    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
-    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-dblp.ungraph.txt";
-    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-youtube.ungraph.txt";
-    //std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-lj.ungraph.txt";
-
-    Graph* query_graph = new Graph();
-    query_graph->loadGraphFromFile(input_query_graph_file);
-
-    query_graph->printGraphMetaData();
-
-    Graph* data_graph = new Graph();
-    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
-
-    data_graph->printGraphMetaData();
-}*/
-
 
 //Main Run
 /*
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
-    std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
+    std::string input_query_graph_file = "../tests/basic_query_graph.graph";
+    std::string input_data_graph_file = "../tests/basic_data_graph.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/soc-LiveJournal1.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/roadNet-CA.txt";
 
     Graph* query_graph = new Graph();
-    query_graph->loadGraphFromFile(input_query_graph_file);
+    //query_graph->loadGraphFromFile(input_query_graph_file);
+    query_graph->loadDirectedGraphFromFile(input_query_graph_file);
 
     query_graph->printGraphMetaData();
 
     Graph* data_graph = new Graph();
+    //data_graph->loadGraphFromFile(input_data_graph_file);
     //data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
-    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    data_graph->loadDirectedGraphFromFile(input_data_graph_file);
 
     data_graph->printGraphMetaData();
 
     std::vector<ui> matching_order;
     std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
 
-    std::vector<bool> visited;
-    int* parent_vtr;
+    //std::vector<bool> visited;
+    //int* parent_vtr;
 
     std::unordered_map<VertexID, ui>* vertex_map = query_graph -> getNeighborhoodLabelCount();
 
     std::cout << "Neighborhood Label Count " << std::endl;
 
 
-    for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
+    /*for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
         visited.push_back(false);
     }
 
     studyPerformance(query_graph, data_graph);
 
-}*/
+}
+*/
+
 
 int main(int argc, char** argv) {
 
@@ -514,14 +547,16 @@ int main(int argc, char** argv) {
 
     std::string output_file = "../analysis/analysis_youtube_query_4.graph";
 
+
     Graph* query_graph = new Graph();
     query_graph->loadGraphFromFile(input_query_graph_file);
     //query_graph->loadGraphFromFileWithoutStringConversion(input_query_graph_file);
 
     Graph* data_graph = new Graph();
     //data_graph->loadGraphFromFile(input_data_graph_file);
-    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
-    data_graph->loadGraphFromFileWithWeight(input_data_graph_file);
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFileWithWeight(input_data_graph_file);
+    //data_graph->loadDirectedGraphFromFile(input_data_graph_file);
 
     query_graph->printGraphMetaData();
     data_graph->printGraphMetaData();
@@ -541,6 +576,7 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    analyseResult(query_graph, data_graph, output_file);
+    //analyseResult(query_graph, data_graph, output_file);
+    analyseParallelization(query_graph, data_graph, output_file);
 
 }
