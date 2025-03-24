@@ -1,0 +1,6 @@
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-CA.txt -output ../analysis/road_ca_3n3e_serial.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-CA.txt -output ../analysis/road_ca_3_truss_serial.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-CA.txt -output ../analysis/road_ca_4_clique_serial.txt
+./SubgraphMatching.out -q ../tests/basic_query_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-TX.txt -output ../analysis/road_tx_3n3e_serial.txt
+./SubgraphMatching.out -q ../tests/3_truss_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-TX.txt -output ../analysis/road_tx_3_truss_serial.txt
+./SubgraphMatching.out -q ../tests/4_node_6_edge_graph_wo_label.graph -d /home/kars1/Parallel_computation/dataset/roadNet-TX.txt -output ../analysis/road_tx_4_clique_serial.txt

@@ -1,32 +1,28 @@
 ----------------------------------------
 
 Thread Count : 2
-Embedding Count : 268392620108
-Operation Count : 3993459400
+Embedding Count : 51308
+Operation Count : 5374097
 
 ----------------------------------------
 ----------------------------------------
 
 Thread Count : 4
-Embedding Count : 268392620108
-Operation Count : 3995035631
+Embedding Count : 51308
+Operation Count : 3714446
 
 ----------------------------------------
 ----------------------------------------
 
 Thread Count : 8
-Embedding Count : 268392620108
-Operation Count : 3991058291
+Embedding Count : 51308
+Operation Count : 1748512
 
 ----------------------------------------
 ----------------------------------------
 
 Thread Count : 16
-Embedding Count : 268392620108
-Operation Count : 3954083476
+Embedding Count : 51308
+Operation Count : 1600766
 
 ----------------------------------------
-Enumerate time (seconds): 12466.5
-#Embeddings: 268392620108
-Call Count: 276397463590
--------------------------------- End -----------------------------------
