@@ -3,6 +3,7 @@
 //
 
 #include "FilterVertices.h"
+#include "PruningConstraints.h"
 #include "GeneratingFilterPlan.h"
 #include <memory.h>
 #include <vector>
@@ -52,6 +53,171 @@ FilterVertices::NLFFilter(const Graph *data_graph, const Graph *query_graph, ui 
     return true;
 }
 
+void 
+FilterVertices::printPruneStatistics(const Graph* data_graph, const Graph* query_graph, ui**& candidates, ui*& candidates_count, ui*& order){
+    
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+    }
+
+}
+
+bool
+FilterVertices::exhaustiveFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count, ui *&order, TreeNode *&tree){
+
+    std::map<VertexID, std::vector<VertexID>> candidate_map;
+
+    std::vector<std::tuple<VertexID, VertexID>> edges;
+
+    edges.push_back(std::make_tuple(0,1));
+    edges.push_back(std::make_tuple(1,2));
+    edges.push_back(std::make_tuple(2,0));
+
+    int level_count = 0;
+    ui* level_offset;
+
+    
+
+    FilterVertices::CFLFilterWithLevelInfo(data_graph, query_graph, candidates, candidates_count, order, tree, level_count, level_offset);
+    std::cout << "---- Candidate Count After Only Filter ----- " << std::endl;
+    FilterVertices::printPruneStatistics(data_graph, query_graph, candidates, candidates_count, order);
+
+    PruningConstraints::buildCandidateMap(query_graph, candidates, candidates_count, order, candidate_map);
+
+    PruningConstraints::checkingCycle(data_graph, query_graph, candidates, candidates_count, order, edges, candidate_map);
+    FilterVertices::pruneAfterCycleChecking(data_graph, query_graph, candidates, candidates_count, order, tree, level_count, level_offset);
+
+    std::cout << "---- Candidate Count After Cycle Checking ----- " << std::endl;
+    FilterVertices::printPruneStatistics(data_graph, query_graph, candidates, candidates_count, order);  
+
+    return true; 
+
+}
+
+bool
+FilterVertices::pruneAfterCycleChecking(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
+                          ui *&order, TreeNode *&tree, int& level_count, ui*& level_offset){
+    
+    ui* updated_flag = new ui[data_graph->getVerticesCount()];
+    ui* flag = new ui[data_graph->getVerticesCount()];
+    std::fill(flag, flag + data_graph->getVerticesCount(), 0);
+
+    for (int i = 1; i < level_count; ++i) {
+        
+        // Backward prune.
+        for (int j = level_offset[i + 1] - 1; j >= level_offset[i]; --j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+
+            if (node.fn_count_ > 0) {
+                pruneCandidates(data_graph, query_graph, query_vertex, node.fn_, node.fn_count_, candidates, candidates_count, flag, updated_flag);
+            }
+        }
+
+        std::cout << "Candidate Count After Pruning : " << std::endl;
+        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+        }
+    }
+
+    // Bottom-up refinement.
+    for (int i = level_count - 2; i >= 0; --i) {
+        for (int j = level_offset[i]; j < level_offset[i + 1]; ++j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+
+            if (node.under_level_count_ > 0) {
+                pruneCandidates(data_graph, query_graph, query_vertex, node.under_level_, node.under_level_count_, candidates, candidates_count, flag, updated_flag);
+            }
+        }
+    }
+
+
+    compactCandidates(candidates, candidates_count, query_graph->getVerticesCount());
+
+    delete[] updated_flag;
+    delete[] flag;
+    return isCandidateSetValid(candidates, candidates_count, query_graph->getVerticesCount());
+}
+
+
+bool
+FilterVertices::CFLFilterWithLevelInfo(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
+                          ui *&order, TreeNode *&tree, int& level_count, ui*& level_offset){
+
+    std::cout << "############### CFL Filter ########################" << std::endl;
+
+    allocateBuffer(data_graph, query_graph, candidates, candidates_count);
+    GeneratingFilterPlan::generateCFLFilterPlan(data_graph, query_graph, tree, order, level_count, level_offset);
+    
+    VertexID start_vertex = order[0];
+    computeCandidateWithNLF(data_graph, query_graph, start_vertex, candidates_count[start_vertex], candidates[start_vertex]);
+
+    /*std::cout << "Candidate Count Before Generation : " << std::endl;
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+    }*/
+
+
+    ui* updated_flag = new ui[data_graph->getVerticesCount()];
+    ui* flag = new ui[data_graph->getVerticesCount()];
+    std::fill(flag, flag + data_graph->getVerticesCount(), 0);
+
+    std::cout << "Top down Generation" << std::endl;
+    // Top-down generation.
+    for (int i = 1; i < level_count; ++i) {
+        // Forward generation.
+        for (int j = level_offset[i]; j < level_offset[i + 1]; ++j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+            generateCandidates(data_graph, query_graph, query_vertex, node.bn_, node.bn_count_, candidates, candidates_count, flag, updated_flag);
+        }
+
+        /*std::cout << "Candidate Count After Generation : " << std::endl;
+        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+        }*/
+
+
+        // Backward prune.
+        for (int j = level_offset[i + 1] - 1; j >= level_offset[i]; --j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+
+            if (node.fn_count_ > 0) {
+                pruneCandidates(data_graph, query_graph, query_vertex, node.fn_, node.fn_count_, candidates, candidates_count, flag, updated_flag);
+            }
+        }
+
+        /*std::cout << "Candidate Count After Pruning : " << std::endl;
+        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
+        }*/
+    }
+
+
+
+    // Bottom-up refinement.
+    for (int i = level_count - 2; i >= 0; --i) {
+        for (int j = level_offset[i]; j < level_offset[i + 1]; ++j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+
+            if (node.under_level_count_ > 0) {
+                pruneCandidates(data_graph, query_graph, query_vertex, node.under_level_, node.under_level_count_, candidates, candidates_count, flag, updated_flag);
+            }
+        }
+    }
+
+
+    compactCandidates(candidates, candidates_count, query_graph->getVerticesCount());
+
+    delete[] updated_flag;
+    delete[] flag;
+    return isCandidateSetValid(candidates, candidates_count, query_graph->getVerticesCount());
+}
+
+
 bool
 FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree) {
@@ -94,10 +260,10 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
             generateCandidates(data_graph, query_graph, query_vertex, node.bn_, node.bn_count_, candidates, candidates_count, flag, updated_flag);
         }
 
-        std::cout << "Candidate Count After Generation : " << std::endl;
+        /*std::cout << "Candidate Count After Generation : " << std::endl;
         for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
             std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-        }
+        }*/
 
 
         // Backward prune.
@@ -110,10 +276,10 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
             }
         }
 
-        std::cout << "Candidate Count After Pruning : " << std::endl;
+        /*std::cout << "Candidate Count After Pruning : " << std::endl;
         for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
             std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-        }
+        }*/
     }
 
 
@@ -144,7 +310,7 @@ void FilterVertices::generateCandidates(const Graph *data_graph, const Graph *qu
 
     //flag is track/count of the connection of node with the back neighbors
 
-    std::cout << "################# generateCandidates #############" << std::endl;
+    //std::cout << "################# generateCandidates #############" << std::endl;
 
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);
@@ -216,7 +382,7 @@ void FilterVertices::pruneCandidates(const Graph *data_graph, const Graph *query
                      VertexID *pivot_vertices, ui pivot_vertices_count, VertexID **candidates,
                      ui *candidates_count, ui *flag, ui *updated_flag) {
 
-    std::cout << "################# pruneCandidates #############" << std::endl;
+    //std::cout << "################# pruneCandidates #############" << std::endl;
 
     LabelID query_vertex_label = query_graph->getVertexLabel(query_vertex);
     ui query_vertex_degree = query_graph->getVertexDegree(query_vertex);

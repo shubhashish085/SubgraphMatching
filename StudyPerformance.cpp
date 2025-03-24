@@ -10,6 +10,7 @@
 #include "GeneratingFilterPlan.h"
 #include "Enumeration.h"
 #include "ParallelEnumeration.h"
+#include "PruningConstraints.h"
 #include "wtime.h"
 #include <chrono>
 #include <limits>
@@ -859,6 +860,26 @@ void analyseFiltering(Graph* query_graph, Graph* data_graph){
 }
 
 
+void analyseFilteringAndCycleChecking(Graph* query_graph, Graph* data_graph){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    ui loop_count = 1;
+    //int thread_count[] = {2, 4, 8, 16};
+    int thread_count[] = {2};
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::exhaustiveFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "Done ....." << std::endl;
+}
+
+
 
 void studyPerformance(Graph* query_graph, Graph* data_graph){
 
@@ -926,13 +947,13 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 }
 
 
-//Main Run
+//Filtering Statistics
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/basic_query_graph.graph";
-    std::string input_data_graph_file = "../tests/cyclic_data_graph.graph";
+    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    //std::string input_data_graph_file = "../tests/data_graph_4_same_label.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_wo_label.graph";
-    //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/soc-LiveJournal1.txt";
     //std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/roadNet-CA.txt";
 
@@ -943,15 +964,16 @@ int main(int argc, char** argv) {
     query_graph->printGraphMetaData();
 
     Graph* data_graph = new Graph();
-    //data_graph->loadGraphFromFile(input_data_graph_file);
     //data_graph->loadGraphFromFileWithEdge(input_data_graph_file);
-    //data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
-    data_graph->loadGraphFromFile(input_data_graph_file);
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+    //data_graph->loadGraphFromFile(input_data_graph_file);
     //data_graph->loadDirectedGraphFromFile(input_data_graph_file);
 
     data_graph->printGraphMetaData();
 
-    analyseFiltering(query_graph, data_graph);
+    //analyseFiltering(query_graph, data_graph);
+    analyseFilteringAndCycleChecking(query_graph, data_graph);
+
 
     // std::vector<ui> matching_order;
     // std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
@@ -973,12 +995,9 @@ int main(int argc, char** argv) {
 }
 
 
-<<<<<<< HEAD
 /*
 int main(int argc, char** argv) {
-=======
-/*int main(int argc, char** argv) {
->>>>>>> 3c3f0b6823f75072ef06fbfcd4749d6b46d43300
+
 
     MatchingCommand command(argc, argv);
     std::string input_query_graph_file = command.getQueryGraphFilePath();
@@ -1032,11 +1051,12 @@ int main(int argc, char** argv) {
         analyseParallelizationForWeakScaling(query_graph, data_graph, output_file, division_factor[i]);
 
     }
-<<<<<<< HEAD
-=======
+
 
 }*/
 
+
+/*
 int main(int argc, char** argv) {
 
     std::cout << " Data graph : RoadNet CA " << std::endl;
@@ -1049,7 +1069,7 @@ int main(int argc, char** argv) {
     data_graph->loadDirectedGraphFromFile("/home/kars1/Parallel_computation/dataset/roadNet-TX.txt");
     data_graph->printGraphDegreeData();
 
-    /*std::cout << " Data graph : Youtube " << std::endl;
+    std::cout << " Data graph : Youtube " << std::endl;
     data_graph = new Graph();
     data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt");
     data_graph->printGraphDegreeData();
@@ -1062,8 +1082,7 @@ int main(int argc, char** argv) {
     std::cout << " Data graph : Livejournal " << std::endl;
     data_graph = new Graph();
     data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt");
-    data_graph->printGraphDegreeData();*/
->>>>>>> 3c3f0b6823f75072ef06fbfcd4749d6b46d43300
+    data_graph->printGraphDegreeData();
 
 }*/
 
