@@ -17,6 +17,8 @@ public:
     static bool NLFFilter(const Graph* data_graph, const Graph* query_graph, ui** &candidates, ui* &candidates_count);
     static bool CFLFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree);
+    static bool PruneJuiceFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
+                          ui *&order, TreeNode *&tree);
     static bool CFLFilterWithLevelInfo(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree, int& level_count, ui*& level_offset);
     static bool exhaustiveFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
@@ -38,9 +40,9 @@ public:
     static bool pruneAfterCycleChecking(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count,
                           ui *&order, TreeNode *&tree, int& level_count, ui*& level_offset);
     static void printPruneStatistics(const Graph* data_graph, const Graph* query_graph, ui**& candidates, ui*& candidates_count, ui*& order);
-private:
+    
+private:   
     static void allocateBuffer(const Graph* data_graph, const Graph* query_graph, ui** &candidates, ui* &candidates_count);
-
     static void compactCandidates(ui** &candidates, ui* &candidates_count, ui query_vertex_num);
 
     static bool isCandidateSetValid(ui** &candidates, ui* &candidates_count, ui query_vertex_num);

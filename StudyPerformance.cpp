@@ -860,6 +860,33 @@ void analyseFiltering(Graph* query_graph, Graph* data_graph){
 }
 
 
+void analysePruneJuiceFilter(Graph* query_graph, Graph* data_graph){
+
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    ui loop_count = 1;
+    //int thread_count[] = {2, 4, 8, 16};
+    int thread_count[] = {2};
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    std::string output_file_path = "output.txt";
+
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    FilterVertices::PruneJuiceFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    std::cout << "Exploration Started for PruneJuice Filter ..... " << std::endl;
+
+    embedding_count = Enumerate::exploreAndAnalysis(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree,
+                                                 vertex_participating_in_embedding,output_limit, call_count, output_file_path);
+
+    std::cout << "Embedding ..... : " << embedding_count << std::endl;
+
+}
+
 void analyseFilteringAndCycleChecking(Graph* query_graph, Graph* data_graph){
 
     ui* matching_order = NULL;
@@ -872,11 +899,19 @@ void analyseFilteringAndCycleChecking(Graph* query_graph, Graph* data_graph){
     int thread_count[] = {2};
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
+    std::string output_file_path = "output.txt";
+
     ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
 
     FilterVertices::exhaustiveFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+    //FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
 
-    std::cout << "Done ....." << std::endl;
+    std::cout << "Exploration Started ....... " << std::endl;
+
+    embedding_count = Enumerate::exploreAndAnalysis(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree,
+                                                 vertex_participating_in_embedding,output_limit, call_count, output_file_path);
+
+    std::cout << "Embedding ..... : " << embedding_count << std::endl;
 }
 
 
@@ -972,8 +1007,8 @@ int main(int argc, char** argv) {
     data_graph->printGraphMetaData();
 
     //analyseFiltering(query_graph, data_graph);
-    analyseFilteringAndCycleChecking(query_graph, data_graph);
-
+    //analyseFilteringAndCycleChecking(query_graph, data_graph);
+    analysePruneJuiceFilter(query_graph, data_graph);
 
     // std::vector<ui> matching_order;
     // std::vector<std::pair<VertexID, VertexID>> non_tree_edges;

@@ -56,9 +56,62 @@ FilterVertices::NLFFilter(const Graph *data_graph, const Graph *query_graph, ui 
 void 
 FilterVertices::printPruneStatistics(const Graph* data_graph, const Graph* query_graph, ui**& candidates, ui*& candidates_count, ui*& order){
     
+    std::cout << "Prune Statistics ...... " << std::endl;
+
     for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
         std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
     }
+
+}
+
+bool
+FilterVertices::PruneJuiceFilter(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count, ui *&order, TreeNode *&tree){
+
+    std::cout << "In the PruneJuice Filter" << std::endl;
+
+    int level_count = 0;
+    ui* level_offset;
+    std::map<VertexID, std::vector<VertexID>> candidate_map;
+
+    std::vector<std::tuple<VertexID, VertexID>> edges;
+    ui step_no = 0, pruned_vtx_count = 0;
+
+    edges.push_back(std::make_tuple(0,1));
+    edges.push_back(std::make_tuple(1,2));
+    edges.push_back(std::make_tuple(2,0));
+
+
+    FilterVertices::allocateBuffer(data_graph, query_graph, candidates, candidates_count);
+    GeneratingFilterPlan::generateCFLFilterPlan(data_graph, query_graph, tree, order, level_count, level_offset);
+    
+    while (true)
+    {
+        /*PruningConstraints::checkLocalConstraints(data_graph, query_graph, candidates, candidates_count, order, step_no);
+        if(step_no == 0){
+            PruningConstraints::buildCandidateMap(query_graph, candidates, candidates_count, order, candidate_map);
+            pruned_vtx_count = PruningConstraints::checkingCycle(data_graph, query_graph, candidates, candidates_count, order, edges, candidate_map);
+        }
+        
+        
+        step_no++;
+        if(step_no == 2){
+            break;
+        }*/
+
+        PruningConstraints::checkLocalConstraints(data_graph, query_graph, candidates, candidates_count, order, step_no);
+        PruningConstraints::buildCandidateMap(query_graph, candidates, candidates_count, order, candidate_map);
+        pruned_vtx_count = PruningConstraints::checkingCycle(data_graph, query_graph, candidates, candidates_count, order, edges, candidate_map);
+
+        if(pruned_vtx_count == 0){
+            break;
+        }
+
+        step_no++;        
+    }
+
+    FilterVertices::printPruneStatistics(data_graph, query_graph, candidates, candidates_count, order);
+
+    return true;
 
 }
 
@@ -103,6 +156,17 @@ FilterVertices::pruneAfterCycleChecking(const Graph *data_graph, const Graph *qu
     std::fill(flag, flag + data_graph->getVerticesCount(), 0);
 
     for (int i = 1; i < level_count; ++i) {
+
+        // Forward Prune
+        for (int j = level_offset[i]; j < level_offset[i + 1]; ++j) {
+            VertexID query_vertex = order[j];
+            TreeNode& node = tree[query_vertex];
+
+            if(node.bn_count_ > 0){
+                pruneCandidates(data_graph, query_graph, query_vertex, node.bn_, node.bn_count_, candidates, candidates_count, flag, updated_flag);
+            }            
+        }
+
         
         // Backward prune.
         for (int j = level_offset[i + 1] - 1; j >= level_offset[i]; --j) {
@@ -113,15 +177,10 @@ FilterVertices::pruneAfterCycleChecking(const Graph *data_graph, const Graph *qu
                 pruneCandidates(data_graph, query_graph, query_vertex, node.fn_, node.fn_count_, candidates, candidates_count, flag, updated_flag);
             }
         }
-
-        std::cout << "Candidate Count After Pruning : " << std::endl;
-        for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-            std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-        }
     }
 
     // Bottom-up refinement.
-    for (int i = level_count - 2; i >= 0; --i) {
+    /*for (int i = level_count - 2; i >= 0; --i) {
         for (int j = level_offset[i]; j < level_offset[i + 1]; ++j) {
             VertexID query_vertex = order[j];
             TreeNode& node = tree[query_vertex];
@@ -130,7 +189,7 @@ FilterVertices::pruneAfterCycleChecking(const Graph *data_graph, const Graph *qu
                 pruneCandidates(data_graph, query_graph, query_vertex, node.under_level_, node.under_level_count_, candidates, candidates_count, flag, updated_flag);
             }
         }
-    }
+    }*/
 
 
     compactCandidates(candidates, candidates_count, query_graph->getVerticesCount());

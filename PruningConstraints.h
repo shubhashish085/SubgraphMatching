@@ -16,7 +16,8 @@ class PruningConstraints {
 public:
     static void buildCandidateMap(const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order, std::map<VertexID, std::vector<VertexID>>& candidate_map);
     static bool isCandidate(VertexID query_vertex, VertexID vertexToBeChecked, std::map<VertexID, std::vector<VertexID>>& candidate_map);
-    static void checkingCycle(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+    static void checkLocalConstraints(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count, ui *order, ui step_no);
+    static ui checkingCycle(const Graph *data_graph, const Graph *query_graph, ui **&candidates, ui *&candidates_count, ui *&order,
                                         std::vector<std::tuple<VertexID, VertexID>>& edges, std::map<VertexID, std::vector<VertexID>>& candidate_map);
 
 };
