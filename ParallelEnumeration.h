@@ -8,6 +8,7 @@
 
 #include "types.h"
 #include "graph.h"
+#include <map>
 
 
 class ParallelEnumeration {
@@ -26,7 +27,9 @@ public:
                                                   TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count, ui* thread_map, size_t* result);
     static size_t** exploreWithEvenDegreeDist(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
                                                         TreeNode *& tree, size_t thread_output_limit_num, size_t &call_count, int &thread_count, ui* candidate_limit);
-
+    static size_t** exploreGraphWithAutomorphismBreak(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+                                                       TreeNode *&tree,  size_t thread_output_limit_num, size_t &call_count, int &thread_count, 
+                                                       std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map);
 };
 
 

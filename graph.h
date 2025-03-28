@@ -81,6 +81,10 @@ public:
         return offsets;
     }
 
+    const ui* getNeighbors() const {
+        return neighbors;
+    }
+
     const ui getLabelsCount() const {
         return labels_count;
     }

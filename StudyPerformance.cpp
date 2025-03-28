@@ -10,6 +10,7 @@
 #include "GeneratingFilterPlan.h"
 #include "Enumeration.h"
 #include "ParallelEnumeration.h"
+#include "Automorphism.h"
 #include "wtime.h"
 #include <chrono>
 #include <limits>
@@ -701,6 +702,67 @@ void analyseParallelizationWithDynamicLoadBalance(Graph* query_graph, Graph* dat
 
 }
 
+
+void analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(Graph* query_graph, Graph* data_graph){
+
+    std::vector< std::pair<ui, ui> > ordered_pairs;
+    std::map<ui, std::vector<std::pair<ui, ui>>> schedule_restriction_map; 
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    ui loop_count = 4;
+    int thread_count[] = {2, 4, 8, 16};
+    //int thread_count[] = {16};
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    ui* adj_mat = Automorphism::convert_to_adj_mat(query_graph-> getVerticesCount(), query_graph->getOffsets(), query_graph ->getNeighbors());
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+    // std::cout << "####### Candidate count  : " ;
+
+    // for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+    //     std::cout << candidates_count[i] << " " ;
+    // }
+
+    Automorphism::aggressive_optimize(ordered_pairs, adj_mat, query_graph->getVerticesCount());
+    Automorphism::restriction_integration_with_scheduling(matching_order, query_graph->getVerticesCount(), ordered_pairs, schedule_restriction_map);
+
+    std::cout << std::endl;
+
+    //Parallel Strategy
+    double start_time, end_time;
+
+    std::cout << "Exploration Started" << std::endl;
+    for (ui i = 0; i < loop_count; i++){
+
+        embedding_count = 0;
+        call_count = 0;
+
+        start_time = wtime();
+        size_t** embedding_cnt_array = ParallelEnumeration::exploreGraphWithAutomorphismBreak(data_graph, query_graph, candidates,
+                                                                                          candidates_count, matching_order, query_tree, output_limit, 
+                                                                                          call_count, thread_count[i], schedule_restriction_map);
+        for(ui idx = 0; idx < thread_count[i]; idx++){
+            embedding_count += embedding_cnt_array[idx][0];
+        }
+
+        end_time = wtime();
+        std::cout << "Thread Count : " << thread_count[i] << std::endl;
+        std::cout << "Embedding Count : " << embedding_count << std::endl;
+        /*ParallelEnumeration::writeResult(output_file_path, thread_count[i], call_count, embedding_count);*/
+
+
+
+        std::cout << "Time " << end_time - start_time << std::endl;
+    }
+
+}
+
 void writeThreadIdAndCount(const std::string& file_path, ui** candidates, ui* candidate_count, ui start_vertex, ui* thread_map, size_t* result){
     std::ofstream outputfile;
     outputfile.open(file_path, std::ios::app);
@@ -995,7 +1057,7 @@ int main(int argc, char** argv) {
 
 }*/
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     std::cout << " Data graph : RoadNet CA " << std::endl;
     Graph* data_graph = new Graph();
@@ -1007,7 +1069,7 @@ int main(int argc, char** argv) {
     data_graph->loadDirectedGraphFromFile("/home/kars1/Parallel_computation/dataset/roadNet-TX.txt");
     data_graph->printGraphDegreeData();
 
-    /*std::cout << " Data graph : Youtube " << std::endl;
+    std::cout << " Data graph : Youtube " << std::endl;
     data_graph = new Graph();
     data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt");
     data_graph->printGraphDegreeData();
@@ -1020,19 +1082,19 @@ int main(int argc, char** argv) {
     std::cout << " Data graph : Livejournal " << std::endl;
     data_graph = new Graph();
     data_graph->loadGraphFromFileWithoutStringConversion("/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt");
-    data_graph->printGraphDegreeData();*/
+    data_graph->printGraphDegreeData();
 
-}
+}*/
 
 
 
-/*int main(int argc, char** argv) {
+int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
@@ -1070,10 +1132,9 @@ int main(int argc, char** argv) {
     }
 
 
-    analyseResult(query_graph, data_graph, output_file);
+    //analyseResult(query_graph, data_graph, output_file);
     //analyseParallelization(query_graph, data_graph, output_file);
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
-
-
-}*/
+    analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(query_graph, data_graph);
+}
