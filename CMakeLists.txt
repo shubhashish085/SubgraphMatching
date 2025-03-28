@@ -27,6 +27,8 @@ set(SUBGRAPH_MATCHING_FILE_LIST
         Enumeration.cpp
         ParallelEnumeration.h
         ParallelEnumeration.cpp
+        PruningConstraints.h
+        PruningConstraints.cpp
         graph.cpp
         graph.h
         utilities.cpp

@@ -44,13 +44,13 @@ void Enumerate::generateValidCandidates(const Graph *data_graph, ui depth, ui *e
 
     std::cout << std::endl;
 
-    std::cout << "Valid Candidates " << std::endl;
+    /*std::cout << "Valid Candidates " << std::endl;
     for(ui i = 0; i <= depth; i++){
         for(ui j = 0; j < idx_count[i]; j++){
             std::cout << valid_candidate[i][j] << " " ;
         }
         std::cout << std::endl;
-    }
+    }*/
 
 }
 
@@ -728,7 +728,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
 
 
     VertexID* intersection_result = new VertexID[max_candidate_count];
-    ui intersection_length = 0;
+    ui intersection_length = 0, vertex_participated_in_embedding = 0, embedding_for_first_vertex = 0;
 
     std::cout << "Candidate count of Start Vertex : " << candidates_count[start_vertex] << std::endl;
     idx[cur_depth] = 0;
@@ -750,6 +750,7 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
 
             if (cur_depth == max_depth - 1) {
                 embedding_cnt += 1;
+                embedding_for_first_vertex += 1;
                 visited_vertices[v] = false;
                 //printMatch(embedding, query_graph->getVerticesCount());
                 //increment_vertex_participation(embedding, query_graph->getVerticesCount(), vertex_participation_in_embedding);
@@ -785,7 +786,11 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
         if (cur_depth < 0)
             break;
         else if (cur_depth == 0){
-            //std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
+            if(embedding_for_first_vertex > 0){
+                vertex_participated_in_embedding += 1;
+                embedding_for_first_vertex = 0;
+            }
+            
             visited_vertices[embedding[order[cur_depth]]] = false;
         }else {
             visited_vertices[embedding[order[cur_depth]]] = false;
@@ -809,9 +814,9 @@ size_t Enumerate::exploreAndAnalysis(const Graph *data_graph, const Graph *query
     delete[] intersection_result;
 
 
-
     std::cout << "Total Embedding Count : " << embedding_cnt << std::endl;
-    std::cout << "Total Operation Count : " << call_count << std::endl;
+    std::cout << "Unique Vertex Participating in Matching : " << vertex_participated_in_embedding << std::endl;
+    //std::cout << "Total Operation Count : " << call_count << std::endl;
 
     return embedding_cnt;
 }
@@ -892,7 +897,7 @@ size_t Enumerate::explore(const Graph *data_graph, const Graph *query_graph, ui 
         if (cur_depth < 0)
             break;
         else if (cur_depth == 0){
-            std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
+            //std::cout << "Candidate covered : " << idx[cur_depth] << " of candidate count : " << idx_count[cur_depth] << " at level cur_depth : " << cur_depth << std::endl;
             visited_vertices[embedding[order[cur_depth]]] = false;
         }else {
             visited_vertices[embedding[order[cur_depth]]] = false;
