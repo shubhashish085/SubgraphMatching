@@ -12,6 +12,7 @@
 #include "ParallelEnumeration.h"
 #include "Automorphism.h"
 #include "PruningConstraints.h"
+#include "FileHandler.h"
 
 #include "wtime.h"
 #include <chrono>
@@ -1046,7 +1047,7 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
 
 //Filtering Statistics
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_same_label.graph";
@@ -1088,9 +1089,48 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    studyPerformance(query_graph, data_graph);*/
+    studyPerformance(query_graph, data_graph);
 
-}
+}*/
+
+
+//Count the number of automorphisms
+/*int main(int argc, char** argv) {
+
+    std::vector<std::string> files = FileHandler::getDirectoryFiles();
+    ui* neighbors;
+    ui neighbor_count;
+
+    for(std::string file_name: files){
+        std::cout << "File Name : " << file_name << std::endl;
+        
+        Graph* query_graph = new Graph();
+        query_graph -> loadGraphFromFile(file_name);
+        query_graph -> printGraphMetaData();
+
+        ui* adj_mat = new ui[query_graph->getVerticesCount() * query_graph -> getVerticesCount()];        
+
+        for(ui i = 0; i < query_graph ->getVerticesCount() * query_graph -> getVerticesCount(); i++){            
+                adj_mat[i] = 0;    
+        }
+
+        for(ui i = 0; i < query_graph ->getVerticesCount(); i++){
+            
+            neighbors = query_graph->getVertexNeighbors(i, neighbor_count);
+
+            for(ui j = 0; j < neighbor_count; j++){
+                adj_mat[i * query_graph->getVerticesCount() + j] = 1;
+            }
+        }
+
+        std::vector<std::vector<ui>> automorphisms; 
+
+        Automorphism::get_automorphisms(automorphisms, adj_mat, query_graph->getVerticesCount());
+
+        std::cout << "The number of Automorphisms : " << automorphisms.size() << std::endl; 
+    }
+
+}*/
 
 
 /*
@@ -1188,7 +1228,7 @@ int main(int argc, char** argv) {
 
 
 
-/* int main(int argc, char** argv) {
+int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
@@ -1237,4 +1277,4 @@ int main(int argc, char** argv) {
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
     analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(query_graph, data_graph);
-}*/
+}
