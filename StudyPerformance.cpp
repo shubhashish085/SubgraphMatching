@@ -1046,7 +1046,7 @@ void studyPerformance(Graph* query_graph, Graph* data_graph){
 
 
 //Filtering Statistics
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/data_graph_4_same_label.graph";
@@ -1088,9 +1088,9 @@ int main(int argc, char** argv) {
         visited.push_back(false);
     }
 
-    studyPerformance(query_graph, data_graph);*/
+    studyPerformance(query_graph, data_graph);
 
-}
+}*/
 
 
 /*
@@ -1188,13 +1188,13 @@ int main(int argc, char** argv) {
 
 
 
-/* int main(int argc, char** argv) {
+int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
+    std::string input_query_graph_file = "../tests/p1_5n6e.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-dblp.ungraph.txt";
+    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
@@ -1237,4 +1237,4 @@ int main(int argc, char** argv) {
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
     analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(query_graph, data_graph);
-}*/
+}

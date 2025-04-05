@@ -11,12 +11,13 @@ ui* Automorphism::convert_to_adj_mat(ui vertices_count, const ui* offset, const 
 
     ui* adj_mat = new ui[size * size];
     std::fill(adj_mat, adj_mat + (size * size), 0);
+ 
 
-    for(ui i = 0; i < vertices_count + 1; i++){
+    for(ui i = 0; i < vertices_count; i++){
         for(ui j = offset[i]; j < offset[i + 1]; j++){
             adj_mat[i * size + neighbors[j]] = 1; 
         }
-    }
+    } 
 
     return adj_mat;
 }
@@ -133,4 +134,6 @@ void Automorphism:: aggressive_optimize(std::vector< std::pair<ui, ui>>& ordered
             }
         if(tag) ordered_pairs.push_back(L[i]);
     }
+
+    std::cout << "Ordered Pairs " << std::endl;
 }

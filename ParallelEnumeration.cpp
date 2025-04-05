@@ -820,6 +820,7 @@ size_t** ParallelEnumeration::exploreGraphWithAutomorphismBreak(const Graph *dat
         std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the query graph parent of every vertex
     }
 
+
     int max_depth = query_graph->getVerticesCount();
     ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
     VertexID start_vertex = order[0];
@@ -881,8 +882,8 @@ size_t** ParallelEnumeration::exploreGraphWithAutomorphismBreak(const Graph *dat
                         idx[cur_depth] = 0;
                         Enumerate::generateValidCandidatesBreakingAutomorphism(data_graph, cur_depth, embedding, idx_count, valid_candidate,
                                                                                 visited_vertices, tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order,
-                                                                                schedule_restriction_map);    
-                    }
+                                                                                schedule_restriction_map);
+                        }
                 }
 
                 cur_depth -= 1;

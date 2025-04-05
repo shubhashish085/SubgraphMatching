@@ -514,14 +514,16 @@ void Enumerate::generateValidCandidatesBreakingAutomorphism(const Graph* data_gr
     std::vector<std::pair<ui, ui>>::iterator vtr_itr = (it->second).begin();
     ui minimum_value = 0;
 
-    while(vtr_itr != (it->second).end()){ 
-        minimum_value = std::max(embedding[vtr_itr->first], minimum_value);
-        ++vtr_itr; 
-    }
+    if(it != schedule_restriction_map.end()){
+        while(vtr_itr != (it->second).end()){ 
+            minimum_value = std::max(embedding[vtr_itr->first], minimum_value);
+            ++vtr_itr; 
+        }
 
-    if(depth > 0){
-        minimum_value += 1;
-    }
+        if(depth > 0){
+            minimum_value += 1;
+        }
+    }    
     
 
     std::map<ui, ui> intersection_map;
