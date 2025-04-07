@@ -648,6 +648,152 @@ void Enumerate::analyseAndWriteResult(const std::string& file_path, const Graph 
 }
 
 
+size_t Enumerate::exploreGraphWithAutomorphismBreak(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+                                                       TreeNode *&tree,  size_t &call_count, 
+                                                       std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map){
+
+    std::cout << " ################## explore and analysis ##################" << std::endl;
+
+    size_t embedding_cnt = 0;
+    int cur_depth = 0;
+    int max_depth = query_graph->getVerticesCount();
+    VertexID start_vertex = order[0];
+    call_count = 0;
+
+
+    // Allocate the memory buffer.
+    ui *idx;
+    ui *idx_count;
+    ui *embedding;
+    VertexID **valid_candidate;
+    bool *visited_vertices;
+
+    idx = new ui[max_depth];
+    idx_count = new ui[max_depth];
+    embedding = new ui[max_depth];
+    VertexID* intersection_order = new VertexID[max_depth];
+    visited_vertices = new bool[data_graph->getVerticesCount()];
+    std::fill(visited_vertices, visited_vertices + data_graph->getVerticesCount(), false);
+    valid_candidate = new ui *[max_depth];
+
+    ui max_candidate_count = data_graph->getGraphMaxLabelFrequency();
+    std::cout << "Max candidate count : " << max_candidate_count << std::endl;
+    for (ui i = 0; i < max_depth; ++i) {
+        valid_candidate[i] = new VertexID[max_candidate_count];
+    }
+
+    // candidate csr building
+    ui* candidate_track = new ui[data_graph->getVerticesCount()];
+    ui* candidate_offset = new ui[data_graph->getVerticesCount() + 1];
+    ui candidate_csr_count = 0;
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        candidate_csr_count += candidates_count[i];
+    }
+
+    ui* candidate_csr = new ui[candidate_csr_count];
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    candidate_offset[0] = 0;
+
+    for(ui i = 1; i < data_graph -> getVerticesCount() + 1; i++){
+        candidate_offset[i] = candidate_offset[i - 1] + candidate_track[i - 1];
+    }
+
+
+    std::fill(candidate_track, candidate_track + data_graph -> getVerticesCount(), 0);
+
+    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
+        for(ui j = 0; j < candidates_count[i]; j++){
+            VertexID data_vertex = candidates[i][j];
+            candidate_csr[candidate_offset[data_vertex] + candidate_track[data_vertex]] = i;
+            candidate_track[data_vertex]++;
+        }
+    }
+
+    for (ui i = 0; i < data_graph->getVerticesCount() ; ++i) {
+        std::sort(candidate_csr + candidate_offset[i], candidate_csr + candidate_offset[i + 1]); // sorting the query graph parent of every vertex
+    }
+
+
+
+    VertexID* intersection_result = new VertexID[max_candidate_count];
+    ui intersection_length = 0;
+
+    std::cout << "Candidate count of Start Vertex : " << candidates_count[start_vertex] << std::endl;
+    idx[cur_depth] = 0;
+    idx_count[cur_depth] = candidates_count[start_vertex];
+    std::copy(candidates[start_vertex], candidates[start_vertex] + candidates_count[start_vertex],
+              valid_candidate[cur_depth]);
+
+    std::cout << "Entering Loop " << std::endl;
+
+    while (true) {
+        while (idx[cur_depth] < idx_count[cur_depth]) {
+            VertexID u = order[cur_depth];
+            VertexID v = valid_candidate[cur_depth][idx[cur_depth]];
+            embedding[u] = v;
+            visited_vertices[v] = true;
+            idx[cur_depth] += 1;
+            call_count++;
+
+            if (cur_depth == max_depth - 1) {
+                embedding_cnt += 1;
+                visited_vertices[v] = false;
+                
+            } else {
+                call_count += 1;
+                cur_depth += 1;
+                idx[cur_depth] = 0;
+                Enumerate::generateValidCandidatesBreakingAutomorphism(data_graph, cur_depth, embedding, idx_count, valid_candidate,
+                                                                                visited_vertices, tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order,
+                                                                                schedule_restriction_map);                
+            }
+        }
+
+        cur_depth -= 1;
+        if (cur_depth < 0)
+            break;
+        else if (cur_depth == 0){
+                        
+            visited_vertices[embedding[order[cur_depth]]] = false;
+        }else {
+            visited_vertices[embedding[order[cur_depth]]] = false;
+        }
+    }
+
+
+
+    // Release the buffer.
+    EXIT:
+    //analyseAndWriteResult(file_path, data_graph, query_graph, vertex_participation_in_embedding);
+    delete[] idx;
+    delete[] idx_count;
+    delete[] embedding;
+    delete[] visited_vertices;
+    for (ui i = 0; i < max_depth; ++i) {
+        delete[] valid_candidate[i];
+    }
+    delete[] valid_candidate;
+    delete[] intersection_result;
+
+
+    std::cout << "Total Embedding Count : " << embedding_cnt << std::endl;
+
+    return embedding_cnt;
+}
+
+
+
+
 /*
  * Exploration and analysis of sequential algorithm
  */

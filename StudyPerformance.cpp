@@ -705,6 +705,48 @@ void analyseParallelizationWithDynamicLoadBalance(Graph* query_graph, Graph* dat
 }
 
 
+void analyseForSingleThreadAndAutomorphismBreak(Graph* query_graph, Graph* data_graph){
+
+    std::vector< std::pair<ui, ui> > ordered_pairs;
+    std::map<ui, std::vector<std::pair<ui, ui>>> schedule_restriction_map; 
+    ui* matching_order = NULL;
+    TreeNode* query_tree = NULL;
+    ui** candidates = NULL;
+    ui* candidates_count = NULL;
+    size_t call_count = 0;
+    
+    size_t output_limit = std::numeric_limits<size_t>::max();
+    size_t  embedding_count = 0;
+    ui* vertex_participating_in_embedding = new ui[data_graph -> getVerticesCount()];
+
+    ui* adj_mat = Automorphism::convert_to_adj_mat(query_graph-> getVerticesCount(), query_graph->getOffsets(), query_graph ->getNeighbors());
+
+    FilterVertices::CFLFilter(data_graph, query_graph, candidates, candidates_count, matching_order, query_tree);
+
+   
+
+    Automorphism::aggressive_optimize(ordered_pairs, adj_mat, query_graph->getVerticesCount());
+    Automorphism::restriction_integration_with_scheduling(matching_order, query_graph->getVerticesCount(), ordered_pairs, schedule_restriction_map);
+
+    std::cout << std::endl;
+
+    //Serial Implementation
+    double start_time, end_time;
+
+    std::cout << "Exploration Started" << std::endl;
+    
+    start_time = wtime();
+    embedding_count = Enumerate::exploreGraphWithAutomorphismBreak(data_graph, query_graph, candidates,
+                                                                                          candidates_count, matching_order, query_tree, 
+                                                                                          call_count, schedule_restriction_map);;
+    end_time = wtime();
+    std::cout << "Serial - Embedding Count : " << embedding_count  << std::endl;
+    std::cout << "Time " << end_time - start_time << std::endl;
+
+}
+
+
+
 void analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(Graph* query_graph, Graph* data_graph){
 
     std::vector< std::pair<ui, ui> > ordered_pairs;
@@ -1188,7 +1230,7 @@ int main(int argc, char** argv) {
 
 
 
-int main(int argc, char** argv) {
+/*int main(int argc, char** argv) {
 
     std::string input_query_graph_file = "../tests/p1_5n6e.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
@@ -1237,4 +1279,43 @@ int main(int argc, char** argv) {
     //analyseParallelizationWithLoadBalance(query_graph, data_graph, output_file);
     //analyseDegree(query_graph, data_graph);
     analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(query_graph, data_graph);
+}*/
+
+
+//Analysis For Single Thread
+int main(int argc, char** argv) {
+
+    MatchingCommand command(argc, argv);
+    std::string input_query_graph_file = command.getQueryGraphFilePath();
+    std::string input_data_graph_file = command.getDataGraphFilePath();
+    std::string output_performance_file = command.getOutputFilePath();
+
+    std::cout << "Pattern Graph : " << input_query_graph_file << std::endl;
+    std::cout << "Data Graph : " << input_data_graph_file << std::endl; 
+
+    Graph* query_graph = new Graph();
+    query_graph->loadGraphFromFile(input_query_graph_file);
+
+    Graph* data_graph = new Graph();
+    data_graph->loadGraphFromFileWithoutStringConversion(input_data_graph_file);
+
+    query_graph->printGraphMetaData();
+    data_graph->printGraphMetaData();
+
+    std::vector<ui> matching_order;
+    std::vector<std::pair<VertexID, VertexID>> non_tree_edges;
+
+    std::vector<bool> visited;
+    int* parent_vtr;
+
+    std::unordered_map<VertexID, ui>* vertex_map = query_graph -> getNeighborhoodLabelCount();
+
+    std::cout << "Neighborhood Label Count " << std::endl;
+
+
+    for(ui i = 0; i < query_graph-> getVerticesCount(); i++){
+        visited.push_back(false);
+    }
+    
+    analyseForSingleThreadAndAutomorphismBreak(query_graph, data_graph);
 }

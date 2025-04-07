@@ -134,6 +134,4 @@ void Automorphism:: aggressive_optimize(std::vector< std::pair<ui, ui>>& ordered
             }
         if(tag) ordered_pairs.push_back(L[i]);
     }
-
-    std::cout << "Ordered Pairs " << std::endl;
 }

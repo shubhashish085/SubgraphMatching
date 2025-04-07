@@ -32,6 +32,10 @@ public:
     static size_t exploreAndAnalysis(const Graph *data_graph, const Graph *query_graph, ui **candidates,
                                    ui *candidates_count, ui *order, TreeNode *& tree, ui* vertex_participation_in_embedding,
                                    size_t output_limit_num, size_t &call_count, const std::string& file_path);
+    
+    static size_t exploreGraphWithAutomorphismBreak(const Graph *data_graph, const Graph *query_graph, ui **candidates, ui *candidates_count, ui *order,
+                                                       TreeNode *&tree,   size_t &call_count, 
+                                                       std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map);
 
     static void generateValidCandidates(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                         bool* visited_vertices, TreeNode *&tree, ui* order, ui **candidates, ui* candidates_count);
