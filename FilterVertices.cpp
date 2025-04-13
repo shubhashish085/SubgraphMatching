@@ -297,12 +297,6 @@ FilterVertices::CFLFilter(const Graph *data_graph, const Graph *query_graph, ui 
     VertexID start_vertex = order[0];
     computeCandidateWithNLF(data_graph, query_graph, start_vertex, candidates_count[start_vertex], candidates[start_vertex]);
 
-    std::cout << "Candidate Count Before Generation : " << std::endl;
-    for(ui i = 0; i < query_graph -> getVerticesCount(); i++){
-        std::cout << "Vertex : " << i << " : " << candidates_count[i] << std::endl ;
-    }
-
-
 
 
     ui* updated_flag = new ui[data_graph->getVerticesCount()];

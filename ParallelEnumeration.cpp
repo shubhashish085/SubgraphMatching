@@ -775,6 +775,12 @@ size_t** ParallelEnumeration::exploreGraphWithAutomorphismBreak(const Graph *dat
     size_t** embedding_cnt_array = new size_t * [thread_count];
     double* thread_wise_time = new double [thread_count];
 
+    ui* order_idx = new ui[query_graph->getVerticesCount()];
+
+    for(ui i = 0; i < query_graph->getVerticesCount(); i++){
+        order_idx[order[i]] = i;
+    }
+
     for(ui i = 0; i < thread_count; i++){
         embedding_cnt_array[i] = new size_t [PAD];
         embedding_cnt_array[i][0] = 0;
@@ -853,7 +859,7 @@ size_t** ParallelEnumeration::exploreGraphWithAutomorphismBreak(const Graph *dat
         }
 
 
-#pragma omp for schedule(dynamic, 5)
+#pragma omp for schedule(dynamic, 1)
         for(par_loop_idx = 0; par_loop_idx < candidates_count[start_vertex]; par_loop_idx++){
 
             cur_depth = 0;
@@ -881,7 +887,7 @@ size_t** ParallelEnumeration::exploreGraphWithAutomorphismBreak(const Graph *dat
                         cur_depth += 1;
                         idx[cur_depth] = 0;
                         Enumerate::generateValidCandidatesBreakingAutomorphism(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                                                visited_vertices, tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order,
+                                                                                visited_vertices, tree, order, order_idx, candidate_offset, candidate_csr, intersection_result, intersection_order,
                                                                                 schedule_restriction_map);
                         }
                 }

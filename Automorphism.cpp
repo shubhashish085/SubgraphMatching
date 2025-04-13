@@ -80,6 +80,30 @@ void Automorphism::restriction_integration_with_scheduling(ui*& schedule, ui siz
             }  
         }
     }
+
+    std::cout << "Schedule : " << std::endl;
+
+    for (ui i = 0; i < size; i++){
+        std::cout << schedule[i] << " " ;
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "Schedule Restriction Map : " << std::endl;
+
+    for (ui i = 0; i < size; i++){
+
+        std::map<ui, std::vector<std::pair<ui, ui>>>::iterator it = schedule_restriction_map.find(i);
+        std::cout << i << "->" ;
+        if(it != schedule_restriction_map.end()){
+            for (ui j = 0; j < (it ->second).size(); j++){
+                std::cout << "(" << (it ->second)[j].first << "," << (it ->second)[j].second << "), " ; 
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    
 }
 
 void Automorphism:: aggressive_optimize(std::vector< std::pair<ui, ui>>& ordered_pairs, ui* adj_mat, ui size) { 
@@ -134,4 +158,13 @@ void Automorphism:: aggressive_optimize(std::vector< std::pair<ui, ui>>& ordered
             }
         if(tag) ordered_pairs.push_back(L[i]);
     }
+
+
+    std::cout << "Ordered Pairs : " << std::endl;
+
+    for (ui i = 0; i < ordered_pairs.size(); i++){
+
+        std::cout << ordered_pairs[i].first << ", " << ordered_pairs[i].second << std::endl;
+    }
+
 }

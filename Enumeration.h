@@ -73,7 +73,7 @@ public:
                                         ui *order, ui **candidates, ui *candidates_count);
 
     static void generateValidCandidatesBreakingAutomorphism(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
-                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
+                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* order_idx, ui* candidate_offset, ui* candidate_csr,
                                                                      VertexID* intersection_array, VertexID* intersection_order, 
                                                                      std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map);
 

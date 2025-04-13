@@ -498,7 +498,96 @@ void Enumerate::generateValidCandidatesWithBinarySearch(const Graph* data_graph,
     }
 }
 
-void Enumerate::generateValidCandidatesBreakingAutomorphism(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
+void Enumerate::generateValidCandidatesBreakingAutomorphism(const Graph* data_graph, ui depth,  ui* embedding, ui* idx_count, ui** valid_candidate,
+                                                                     bool* visited_vertices,TreeNode *&tree, ui* order, ui* order_idx, ui* candidate_offset, ui* candidate_csr,
+                                                                     VertexID* intersection_array, VertexID* intersection_order, 
+                                                                     std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map){
+
+    VertexID u = order[depth];
+    ui neighbor_count = 0;
+
+    ui set_ints_length = 0, l_length = 0, min_neighbor_count = INTMAX_MAX;
+
+    idx_count[depth] = 0;
+
+    std::map<ui, std::vector<std::pair<ui, ui>>>::iterator it = schedule_restriction_map.find(depth);
+    
+    int minimum_value = -1;
+    int maximum_value = data_graph->getVerticesCount() + 5;
+
+
+    if(it != schedule_restriction_map.end()){
+
+        std::vector<std::pair<ui, ui>>::iterator vtr_itr = (it->second).begin();
+
+        while(vtr_itr != (it->second).end()){
+
+            if(order_idx[vtr_itr->first] > order_idx[vtr_itr->second]){
+                maximum_value = std::min((int)embedding[vtr_itr->second], maximum_value);                
+            }else {
+                minimum_value = std::max((int)embedding[vtr_itr->first], minimum_value);                 
+            }
+
+            ++vtr_itr; 
+        }
+    } 
+
+    
+    
+
+    std::map<ui, ui> intersection_map;
+    std::map<ui, ui>::iterator search_result;
+
+    ui bn_count = tree[u].bn_count_;
+
+    for (ui i = 0; i < bn_count; i++){
+        intersection_order[i] = embedding[tree[u].bn_[i]];
+    }
+
+    for (ui i = 0; i < bn_count; i++){
+        data_graph ->getNeighborCount(intersection_order[i], neighbor_count);
+        if (neighbor_count < min_neighbor_count){
+            ui temp = intersection_order[i];
+            intersection_order[i] = intersection_order[0];
+            intersection_order[0] = temp;
+            min_neighbor_count = neighbor_count;
+        }
+    }
+
+    for (ui i = 0; i < bn_count; i++){
+
+        VertexID* neighbors = data_graph ->getVertexNeighbors(intersection_order[i], neighbor_count);
+
+        if(i == 0){
+            std::copy(neighbors, neighbors + neighbor_count, intersection_array);
+            set_ints_length = neighbor_count;
+            l_length = set_ints_length;
+        }else{
+            Utilities::set_intersection_tp(intersection_array, l_length, neighbors, neighbor_count, set_ints_length);
+            l_length = set_ints_length;
+        }
+    }
+
+    ui minimum_idx = 0;
+
+
+    for(ui i = minimum_idx; i < set_ints_length; i++){
+        VertexID v = intersection_array[i];
+        int vertex = (int) v;
+        if(!visited_vertices[v] && vertex > minimum_value && vertex < maximum_value) {
+            for (ui index = candidate_offset[v]; index < candidate_offset[v + 1]; index++) {
+                if (candidate_csr[index] == u) {
+                    valid_candidate[depth][idx_count[depth]++] = v;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+
+
+/*void Enumerate::generateValidCandidatesBreakingAutomorphism(const Graph* data_graph, ui depth, ui* embedding, ui* idx_count, ui** valid_candidate,
                                                                      bool* visited_vertices,TreeNode *&tree, ui* order, ui* candidate_offset, ui* candidate_csr,
                                                                      VertexID* intersection_array, VertexID* intersection_order, 
                                                                      std::map<ui, std::vector<std::pair<ui, ui>>>& schedule_restriction_map){
@@ -573,7 +662,7 @@ void Enumerate::generateValidCandidatesBreakingAutomorphism(const Graph* data_gr
             }
         }
     }
-}
+}*/
 
 
 void Enumerate::generateValidCandidatesForRecursive(const Graph *data_graph, ui depth, ui *embedding, ui *idx_count,
@@ -660,6 +749,19 @@ size_t Enumerate::exploreGraphWithAutomorphismBreak(const Graph *data_graph, con
     VertexID start_vertex = order[0];
     call_count = 0;
 
+    ui* order_idx = new ui[query_graph->getVerticesCount()];
+
+    std::cout << " Order Index : " << std::endl;
+
+    for(ui i = 0; i < query_graph->getVerticesCount(); i++){
+        order_idx[order[i]] = i;
+    }
+
+    for(ui i = 0; i < query_graph->getVerticesCount(); i++ ){
+        std::cout << order_idx[i] << " ";
+    }
+
+    std::cout << std::endl;
 
     // Allocate the memory buffer.
     ui *idx;
@@ -754,8 +856,8 @@ size_t Enumerate::exploreGraphWithAutomorphismBreak(const Graph *data_graph, con
                 cur_depth += 1;
                 idx[cur_depth] = 0;
                 Enumerate::generateValidCandidatesBreakingAutomorphism(data_graph, cur_depth, embedding, idx_count, valid_candidate,
-                                                                                visited_vertices, tree, order, candidate_offset, candidate_csr, intersection_result, intersection_order,
-                                                                                schedule_restriction_map);                
+                                                                                visited_vertices, tree, order, order_idx, candidate_offset, candidate_csr, intersection_result, intersection_order,
+                                                                                schedule_restriction_map);
             }
         }
 
