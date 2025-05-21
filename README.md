@@ -1,6 +1,6 @@
 # Subgraph Matching Algorithm
 The Problem is NP-Hard. So levering the shared memory implementation to find the exact number of matches of particular query graph in the data graph.
-Specifically **Parallel (Shared Memory) Subgraph Matching Algorithm** in C++ using OpenMP.
+Specifically Implementation of **Parallel (Shared Memory) Subgraph Matching Algorithm** in C++ using OpenMP.
 
 ---
 
