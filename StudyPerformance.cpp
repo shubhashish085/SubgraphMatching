@@ -756,8 +756,8 @@ void analyseParallelizationWithDynamicLoadBalanceAndAutomorphismBreak(Graph* que
     ui** candidates = NULL;
     ui* candidates_count = NULL;
     size_t call_count = 0;
-    ui loop_count = 1;
-    int thread_count[] = {2, 4, 8, 16};
+    ui loop_count = 3;
+    int thread_count[] = { 4, 8, 16};
     //int thread_count[] = {16};
     size_t output_limit = std::numeric_limits<size_t>::max();
     size_t  embedding_count = 0;
@@ -1232,11 +1232,11 @@ int main(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-    std::string input_query_graph_file = "../tests/p2_6n9e.graph";
+    std::string input_query_graph_file = "../tests/4_node_4_edge_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/4_node_graph_wo_label.graph";
     //std::string input_query_graph_file = "../tests/5_node_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/basic_data_graph_wo_label.graph";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-lj.ungraph.txt";
 
     //std::string input_query_graph_file = "../tests/basic_query_graph_wo_label.graph";
     //std::string input_data_graph_file = "../tests/formatted_graph_2048.graph";
@@ -1285,13 +1285,13 @@ int main(int argc, char** argv) {
 //Analysis For Single Thread
 /*int main(int argc, char** argv) {
 
-    /*MatchingCommand command(argc, argv);
-    std::string input_query_graph_file = command.getQueryGraphFilePath();
-    std::string input_data_graph_file = command.getDataGraphFilePath();
-    std::string output_performance_file = command.getOutputFilePath();
+    //MatchingCommand command(argc, argv);
+    //std::string input_query_graph_file = command.getQueryGraphFilePath();
+    //std::string input_data_graph_file = command.getDataGraphFilePath();
+    //std::string output_performance_file = command.getOutputFilePath();
 
     std::string input_query_graph_file = "../tests/p2_6n9e.graph";
-    std::string input_data_graph_file = "/home/antu/Research_Projects/dataset/com-amazon.ungraph.txt";
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/com-youtube.ungraph.txt";
 
     std::cout << "Pattern Graph : " << input_query_graph_file << std::endl;
     std::cout << "Data Graph : " << input_data_graph_file << std::endl; 
@@ -1321,4 +1321,16 @@ int main(int argc, char** argv) {
     }
     
     analyseForSingleThreadAndAutomorphismBreak(query_graph, data_graph);
+}*/
+
+
+//test run
+/*int main(int argc, char** argv) {
+
+    
+    std::string input_data_graph_file = "/home/kars1/Parallel_computation/dataset/graph500-scale20-ef16_adj/graph500-scale20-ef16_adj.edges";
+
+    Graph* data_graph = new Graph();
+    data_graph->loadKroneckerGraphFromFile(input_data_graph_file);
+
 }*/

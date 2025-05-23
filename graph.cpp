@@ -569,6 +569,197 @@ void Graph::loadGraphFromFileWithoutStringConversion(const std::string& file_pat
     //printGraphData();
 }
 
+
+void Graph::loadKroneckerGraphFromFile(const std::string& file_path){
+
+    std::cout << "############# Loading Graph With Edges ###############" << std::endl;
+
+    std::ifstream infile(file_path);
+
+    std::map<VertexID, ui> degree_map;
+    std::map<VertexID, ui>::iterator itr;
+    VertexID max_vertex_id = 0;
+
+    if (!infile.is_open()) {
+        std::cout << "Can not open the graph file " << file_path << " ." << std::endl;
+        exit(-1);
+    }
+
+    char type;
+
+    std::cout << "Reading File............ " << std::endl;
+
+    ui edge_count = 0, count = 0;
+
+    VertexID begin, end;
+    ui label = 0;
+
+
+    while(infile >> begin >> end) {
+
+        if(begin == end){
+            continue;
+        }
+
+        edge_count++;
+
+        if(max_vertex_id < begin){
+            max_vertex_id = begin;
+        }
+
+        if(max_vertex_id < end){
+            max_vertex_id = end;
+        }
+
+        itr = degree_map.find(begin);
+        if(itr != degree_map.end()){
+            itr->second += 1; 
+        }else{
+            degree_map[begin] = 1;
+        }
+
+    }
+
+    infile.close();
+
+    vertices_count = max_vertex_id + 1;
+    edges_count = edge_count / 2;
+
+    degrees = new ui[vertices_count];
+    std::fill(degrees, degrees + vertices_count, 0);
+
+    for(itr = degree_map.begin(); itr != degree_map.end(); itr++){
+        degrees[itr->first] = itr->second;
+    }
+
+
+    std::ifstream input_file(file_path);
+
+    offsets = new ui[vertices_count +  1];
+    offsets[0] = 0;
+
+    neighbors = new VertexID[edge_count];
+    labels = new LabelID[vertices_count];
+    neighborhood_label_count = new std::unordered_map<LabelID, ui>[vertices_count];
+    labels_count = 0;
+    max_degree = 0;
+
+    std::cout << "Initialization Finished" << std::endl;
+
+    std::cout << "Vertices Count : " << vertices_count << " Edge Count : " << edges_count << std::endl;
+
+    LabelID max_label_id = 0, begin_vtx_label, end_vtx_label;
+    std::vector<ui> neighbors_offset(vertices_count, 0);// used for adjust neighbors with offset
+
+
+    for(ui id = 0; id < vertices_count; id++){
+        labels[id] = label;
+        offsets[id + 1] = offsets[id] + degrees[id];
+
+        if (degrees[id] > max_degree) {
+            max_degree = degrees[id];
+        }
+
+        if (labels_frequency.find(label) == labels_frequency.end()) {
+            labels_frequency[label] = 0;
+            if (label > max_label_id)
+                max_label_id = label;
+        }
+
+        labels_frequency[label] += 1;
+    }
+
+    std::cout << "Max Degree : " << max_degree << " " << offsets[vertices_count] << std::endl;
+
+
+    while(input_file >> begin >> end){
+
+        if(begin == end && begin >= vertices_count && end >= vertices_count){
+            continue;
+        }
+        
+
+        ui offset = offsets[begin] + neighbors_offset[begin]; // adjusting the index of neighbor in neighbors array
+        neighbors[offset] = end;
+
+        neighbors_offset[begin] += 1;
+
+        if(neighborhood_label_count[begin].find(labels[end]) == neighborhood_label_count[end].end()){
+            neighborhood_label_count[begin][labels[end]] = 0;
+        }
+        neighborhood_label_count[begin][labels[end]] += 1;
+
+    }
+
+
+    input_file.close();
+    labels_count = (ui)labels_frequency.size() > (max_label_id + 1) ? (ui)labels_frequency.size() : max_label_id + 1;
+
+    for (auto element : labels_frequency) {
+        std::cout << " Max Label Frequency : " << element.second << std::endl;
+        if (element.second > max_label_frequency) {
+            max_label_frequency = element.second;
+        }
+    }
+
+    for (ui i = 0; i < vertices_count; ++i) {
+        std::sort(neighbors + offsets[i], neighbors + offsets[i + 1]); // sorting the neighbors of every vertex
+    }
+
+    BuildReverseIndex();
+}
+
+void Graph::isKroneckerGraphUndirected(const std::string& file_path){
+
+    VertexID begin, end;
+
+    bool isUndirected = true;
+    ui directed_edge_count = 0;
+
+    std::map<std::pair<VertexID, VertexID>, ui> edge_tracker;
+    std::map<std::pair<VertexID, VertexID>, ui>::iterator itr;
+    std::ifstream infile(file_path);
+
+    while (infile >> begin >> end)
+    {
+        if(begin == end){
+            continue;
+        }
+
+        itr = edge_tracker.find(std::make_pair(begin, end));
+
+        if(itr == edge_tracker.end()){
+            itr = edge_tracker.find(std::make_pair(end, begin));
+            if(itr == edge_tracker.end()){
+                edge_tracker[std::make_pair(begin, end)] = 1;
+            }else{
+                itr->second = itr->second + 1;
+            }
+
+        }else{
+            itr -> second = itr-> second + 1;
+        }
+
+    }
+
+    for (itr = edge_tracker.begin(); itr != edge_tracker.end(); ++itr){
+        if(itr-> second != 2){
+            isUndirected = false;
+            directed_edge_count += 1;
+        }
+    }
+
+    if(isUndirected){
+        std::cout << "The graph is undirected" << std::endl;
+    }else{
+        std::cout << "The graph is directed and directed edge count : " << directed_edge_count << std::endl;
+    }
+    
+
+    infile.close();
+}
+
+
 void Graph::loadGraphFromFileForWeakScaling(const std::string& file_path, ui division_factor){
 
     ui highest_threads = 16;

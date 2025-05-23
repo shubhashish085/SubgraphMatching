@@ -68,6 +68,8 @@ public:
     void loadGraphFromFileWithoutStringConversion(const std::string& file_path);
     void loadGraphFromFileForWeakScaling(const std::string& file_path, ui division_factor);
     void loadGraphFromFileWithWeight(const std::string& file_path);
+    void loadKroneckerGraphFromFile(const std::string& file_path);
+    void isKroneckerGraphUndirected(const std::string& file_path);
     void loadDirectedGraphFromFile(const std::string& file_path);
     void printGraphMetaData();
     void printGraphDegreeData();
